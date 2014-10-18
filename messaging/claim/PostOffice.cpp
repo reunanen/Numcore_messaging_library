@@ -474,9 +474,9 @@ private:
 
 #ifdef WIN32
 			const int maxbufsize = 32767;
-			char temp[maxbufsize + 1];
 			DWORD sz = maxbufsize;
-			if (GetUserName(temp, &sz)) {
+			char temp[maxbufsize + 1];
+			if (GetUserNameA(temp, &sz)) {
 				m_username = temp;
 			}
 #else // WIN32
