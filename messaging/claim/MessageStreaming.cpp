@@ -1,6 +1,7 @@
 
 //           Copyright 2007-2008 Juha Reunanen
 //                     2008-2011 Numcore Ltd
+//                     2014      Juha Reunanen
 //
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
@@ -12,6 +13,7 @@
 
 #include "MessageStreaming.h"
 #include <vector>
+#include <assert.h>
 
 namespace claim {
 
