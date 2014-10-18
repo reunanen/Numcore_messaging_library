@@ -3,8 +3,9 @@ The Numcore messaging library v1.2
 
 Copyright 2007-2008 Juha Reunanen
           2008-2012 Numcore Ltd
+          2014 Juha Reunanen
 
-This library is used in Numcore Ltd's products to send and
+This library was used in Numcore Ltd's products to send and
 receive messages between different applications that may run
 on the same host, or on different hosts. The library basically
 extends the Spread toolkit (see http://www.spread.org/) in a
