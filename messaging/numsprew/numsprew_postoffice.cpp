@@ -26,6 +26,7 @@
 #include <cstring>
 #include <sstream>
 #include <fstream>
+#include <algorithm> // std::min
 
 #include "signaling_select.h"
 
