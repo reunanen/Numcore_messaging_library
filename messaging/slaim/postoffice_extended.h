@@ -19,7 +19,7 @@ namespace slaim {
 
 //! An extended post office that allows some useful functions.
 /*! Used at least by claim::BufferedPostOffice, and inherited by
-    numsprew::PostOffice.
+    num0w::PostOffice.
     Probably not to be included directly by any applications. */
 class ExtendedPostOffice 
 : public PostOffice

@@ -36,6 +36,9 @@ namespace numcfc {
 IdGenerator::IdGenerator()
 {
 	srand((unsigned int) (time(NULL) + clock()));
+
+    WSAData wsaData;
+    WSAStartup(MAKEWORD(2, 2), &wsaData);
 }
 
 std::string IdGenerator::GenerateId() const
