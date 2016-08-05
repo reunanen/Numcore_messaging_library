@@ -133,12 +133,6 @@ int main(int argc, char* argv[])
 {
 	numcfc::Logger::LogAndEcho("Program starting - initializing...");
 
-	std::cout
-		<< "                         This product uses software developed by" << std::endl
-		<< "                         Spread Concepts LLC for use in the Spread" << std::endl
-		<< "                         toolkit. For more information about" << std::endl
-		<< "                         Spread see http://www.spread.org" << std::endl;
-
 	numcfc::IdGenerator idGenerator;
 	std::string myId = idGenerator.GenerateId();
 

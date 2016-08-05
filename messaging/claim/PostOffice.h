@@ -14,7 +14,7 @@
 
 //! Complex Library for Application-Independent Messaging, or -- between friends -- just <code>claim</code>.
 /*! This library contains classes and functions that extend the methods that the 
-	libraries <code>slaim</code>, <code>numsprew</code> and <code>numcfc</code> 
+	libraries <code>slaim</code>, <code>num0w</code> and <code>numcfc</code> 
 	offer, partially by combining the benefits due to some of these three.
 */
 namespace claim {

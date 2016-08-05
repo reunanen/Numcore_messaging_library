@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="messaging">
+      <UniqueIdentifier>{ac96da75-5d2a-401b-a8e0-cc4f213a2c01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="messaging\slaim">
+      <UniqueIdentifier>{47c1a866-eff5-453c-a3f5-e45e2627ee21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="messaging\claim">
+      <UniqueIdentifier>{a8c1aafc-c6a2-4d49-a8c9-54b6909fcbcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="numcfc">
+      <UniqueIdentifier>{a5b15fa3-76fa-4a43-8294-1796bf527f0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="messaging\num0w">
+      <UniqueIdentifier>{94867eb7-d0f0-4567-9db7-8db63f927a21}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\messaging\slaim\buffer.h">
+      <Filter>messaging\slaim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\messaging\slaim\bufferitem.h">
+      <Filter>messaging\slaim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\messaging\slaim\errorlog.h">
+      <Filter>messaging\slaim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\messaging\slaim\message.h">
+      <Filter>messaging\slaim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\messaging\slaim\postoffice.h">
+      <Filter>messaging\slaim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\messaging\slaim\postoffice_extended.h">
+      <Filter>messaging\slaim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\messaging\claim\AttributeMessage.h">
+      <Filter>messaging\claim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\messaging\claim\MessageStreaming.h">
+      <Filter>messaging\claim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\messaging\claim\PostOffice.h">
+      <Filter>messaging\claim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\messaging\claim\PostOfficeInitializer.h">
+      <Filter>messaging\claim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\messaging\claim\ThroughputStatistics.h">
+      <Filter>messaging\claim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\numcfc\IdGenerator.h">
+      <Filter>numcfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\numcfc\IniFile.h">
+      <Filter>numcfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\numcfc\Logger.h">
+      <Filter>numcfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\numcfc\ThreadRunner.h">
+      <Filter>numcfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\numcfc\Time.h">
+      <Filter>numcfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\messaging\num0w\num0w_postoffice.h">
+      <Filter>messaging\num0w</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\messaging\slaim\messaging.cpp">
+      <Filter>messaging\slaim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\messaging\claim\AttributeMessage.cpp">
+      <Filter>messaging\claim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\messaging\claim\MessageStreaming.cpp">
+      <Filter>messaging\claim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\messaging\claim\PostOffice.cpp">
+      <Filter>messaging\claim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\messaging\claim\PostOfficeInitializer.cpp">
+      <Filter>messaging\claim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\numcfc\IdGenerator.cpp">
+      <Filter>numcfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\numcfc\IniFile.cpp">
+      <Filter>numcfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\numcfc\Logger.cpp">
+      <Filter>numcfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\numcfc\ThreadRunner.cpp">
+      <Filter>numcfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\numcfc\Time.cpp">
+      <Filter>numcfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\messaging\num0w\num0w_postoffice.cpp">
+      <Filter>messaging\num0w</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -13,7 +13,7 @@
 #include "PostOffice.h"
 #include "AttributeMessage.h"
 #include "ThroughputStatistics.h"
-#include <messaging/numsprew/numsprew_postoffice.h>
+#include <messaging/num0w/num0w_postoffice.h>
 #include <numcfc/Time.h>
 #include <numcfc/ThreadRunner.h>
 #include <numcfc/IdGenerator.h>
@@ -558,13 +558,17 @@ boost::shared_ptr<slaim::PostOffice> CreatePostOffice(PostOfficeInitializer& ini
 	int port = initializer.GetMessagingServerPort();
 
 	std::ostringstream oss;
-        oss << port;
-        if (!host.empty()) {
-            oss << "@" << host;
-        }
+	oss << "tcp://";
+	if (host.empty()) {
+		oss << "localhost";
+	}
+	else {
+		oss << host;
+	}
+	oss << ":" << port;
 	std::string connectInfo = oss.str();
 
-	boost::shared_ptr<slaim::ExtendedPostOffice> bpo(new numsprew::PostOffice(connectInfo, clientIdentifier));
+	boost::shared_ptr<slaim::ExtendedPostOffice> bpo(new num0w::PostOffice(connectInfo, clientIdentifier));
 
 	//bpo->SetConnectInfo(connectInfo);
 	if (clientIdentifier) {

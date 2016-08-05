@@ -1,13 +1,12 @@
 
-//           Copyright 2007-2008 Juha Reunanen
-//                     2008-2011 Numcore Ltd
+//           Copyright 2016 Juha Reunanen
 //
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef NUMSPREW_POSTOFFICE_H
-#define NUMSPREW_POSTOFFICE_H
+#ifndef NUM0W_POSTOFFICE_H
+#define NUM0W_POSTOFFICE_H
 
 #include <string>
 #include <set>
@@ -16,9 +15,9 @@
 #include "../slaim/postoffice.h"
 #include "../slaim/postoffice_extended.h"
 
-namespace numsprew {
+namespace num0w {
 
-//! The numsprew post office implementation that conforms to the generic slaim::PostOffice interface.
+//! The num0w post office implementation that conforms to the generic slaim::PostOffice interface.
 /*! Note that this class is *not* necessarily thread-safe, meaning that you should
     not call Send() and Receive() simultaneously from different threads.
     Rather, it's been designed to be used as follows:
@@ -72,9 +71,9 @@ public:
 	virtual void Activity();
 
 private:
+    void Register();
 	bool CheckConnection();
 	void RegularOperations();
-	void OnSpreadError(int nSpreadError, const char* szComment = NULL);
 
 	std::set<slaim::MessageType> m_mySubscriptions;
 
@@ -96,4 +95,4 @@ private:
 
 }
 
-#endif // NUMSPREW_POSTOFFICE_H
+#endif // NUM0W_POSTOFFICE_H
