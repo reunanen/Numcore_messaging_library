@@ -69,6 +69,11 @@ Broker::Broker()
 
     std::cout << "Broker initializing @ " << address.str() << "...";
 
+    const int one = 1;
+    router.setsockopt(ZMQ_TCP_KEEPALIVE, &one, sizeof one);
+    router.setsockopt(ZMQ_TCP_KEEPALIVE_IDLE, &one, sizeof one);
+    router.setsockopt(ZMQ_TCP_KEEPALIVE_INTVL, &one, sizeof one);
+
     router.bind(address.str());
 
     std::cout << "Done!" << std::endl;

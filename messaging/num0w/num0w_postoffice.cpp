@@ -49,6 +49,11 @@ PostOffice::PostOffice(const std::string& connectString, const char* clientIdent
 		m_clientIdentifier = "unknown";
 	}
 
+    const int one = 1;
+    pimpl_->dealer.setsockopt(ZMQ_TCP_KEEPALIVE, &one, sizeof one);
+    pimpl_->dealer.setsockopt(ZMQ_TCP_KEEPALIVE_IDLE, &one, sizeof one);
+    pimpl_->dealer.setsockopt(ZMQ_TCP_KEEPALIVE_INTVL, &one, sizeof one);
+
     pimpl_->dealer.connect(m_connectString);
 
     Register();
