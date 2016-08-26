@@ -1,6 +1,6 @@
 [submodule "messaging/num0w/libzmq"]
 	path = messaging/num0w/libzmq
-	url = https://github.com/reunanen/libzmq/
+	url = https://github.com/outotec/libzmq
 [submodule "messaging/num0w/cppzmq"]
 	path = messaging/num0w/cppzmq
 	url = https://github.com/zeromq/cppzmq
