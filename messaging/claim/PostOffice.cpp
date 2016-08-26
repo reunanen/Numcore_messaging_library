@@ -18,12 +18,12 @@
 #include <numcfc/ThreadRunner.h>
 #include <numcfc/IdGenerator.h>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
+#include <condition_variable>
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/thread/condition_variable.hpp>
 
 #include <deque>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 #ifdef WIN32
 //#ifdef _DEBUG
@@ -39,7 +39,7 @@ class BufferedPostOffice
 	, public numcfc::ThreadRunner 
 {
 public:
-	BufferedPostOffice(boost::shared_ptr<slaim::ExtendedPostOffice> postOffice, PostOfficeInitializer& initializer);
+	BufferedPostOffice(std::shared_ptr<slaim::ExtendedPostOffice> postOffice, PostOfficeInitializer& initializer);
 	virtual ~BufferedPostOffice() {
 		AskThreadToStop();
 		m_postOffice->Activity();
@@ -107,7 +107,7 @@ public:
 		}
 	}
 	virtual std::string GetClientAddress() const {
-		boost::mutex::scoped_lock lock(m_clientAddressMutex);
+		std::unique_lock<std::mutex> lock(m_clientAddressMutex);
 		return m_clientAddress;
 	}
 
@@ -116,12 +116,12 @@ public:
 	}
 
 	virtual bool SetError(const std::string& strError) {
-		boost::mutex::scoped_lock lock(m_mutexErrors);
+		std::unique_lock<std::mutex> lock(m_mutexErrors);
 		return ErrorLog::SetError(strError);
 	}
 
 	virtual std::string GetError() {
-		boost::mutex::scoped_lock lock(m_mutexErrors);
+		std::unique_lock<std::mutex> lock(m_mutexErrors);
 		return ErrorLog::GetError();
 	}
 
@@ -158,11 +158,11 @@ private:
 		SetError(oss.str());
 	}
 
-	boost::shared_ptr<slaim::ExtendedPostOffice> m_postOffice;
+	std::shared_ptr<slaim::ExtendedPostOffice> m_postOffice;
 	std::string m_timeStarted;
 	std::string m_version;
 
-	mutable boost::mutex m_clientAddressMutex;
+	mutable std::mutex m_clientAddressMutex;
 	std::string m_clientAddress;
 
 	numcfc::TimeElapsed m_teSinceHostnameLastChecked;
@@ -244,7 +244,7 @@ private:
 		void SetMaxByteCount(size_t maxByteCount) { m_maxByteCount = maxByteCount; }
 
 		bool push_back(const T& item) {
-			boost::mutex::scoped_lock lock(m_mutex);
+			std::unique_lock<std::mutex> lock(m_mutex);
 			if (m_items.size() >= m_maxItemCount) {
 				return false;
 			}
@@ -256,7 +256,7 @@ private:
 
 			{ // signaling
 				{
-					boost::lock_guard<boost::mutex> lock(m_mutexSignaling);
+					std::lock_guard<std::mutex> lock(m_mutexSignaling);
 					m_notified = true;
 				}
 				m_condSignaling.notify_one();	
@@ -272,11 +272,10 @@ private:
 				{ // signaling
 					numcfc::TimeElapsed te;
 					te.ResetToCurrent();
-					boost::unique_lock<boost::mutex> lock(m_mutexSignaling);
+					std::unique_lock<std::mutex> lock(m_mutexSignaling);
 					double secondsLeft = maxSecondsToWait;
 					while (!m_notified && secondsLeft > 0) {
-						boost::posix_time::time_duration td = boost::posix_time::millisec(static_cast<boost::int64_t>(secondsLeft * 1000));
-						m_condSignaling.timed_wait(lock, td);
+						m_condSignaling.wait_for(lock, std::chrono::milliseconds(static_cast<int>(secondsLeft * 1000)));
 						if (!m_notified) {
 							secondsLeft = maxSecondsToWait - te.GetElapsedSeconds();
 							if (secondsLeft > 0.0 && secondsLeft <= 1.0) {
@@ -294,7 +293,7 @@ private:
 				}
 			}
 
-			boost::mutex::scoped_lock lock(m_mutex);
+			std::unique_lock<std::mutex> lock(m_mutex);
 			if (m_items.empty()) {
 				return false; // somebody else got it
 			}
@@ -307,18 +306,18 @@ private:
 			return true;
 		}
 		std::pair<size_t, size_t> GetItemAndByteCount() const {
-			boost::mutex::scoped_lock lock(m_mutex);
+			std::unique_lock<std::mutex> lock(m_mutex);
 			std::pair<size_t, size_t> p(std::make_pair(m_items.size(), m_currentByteCount));
 			return p;
 		}
 
 	private:
-		mutable boost::mutex m_mutex;
+		mutable std::mutex m_mutex;
 		
 		// for signaling
 		mutable bool m_notified;
-		mutable boost::mutex m_mutexSignaling;
-		mutable boost::condition_variable m_condSignaling;
+		mutable std::mutex m_mutexSignaling;
+		mutable std::condition_variable m_condSignaling;
 		
 		std::deque<T> m_items;
 		size_t m_maxItemCount;
@@ -329,7 +328,7 @@ private:
 	LimitedSizeBuffer<slaim::Message> m_recvBuffer;
 	LimitedSizeBuffer<SendBufferAction> m_sendBuffer;
 
-	boost::mutex m_mutexErrors;
+	std::mutex m_mutexErrors;
 
 	ThroughputStatistics m_recvThroughput;
 	ThroughputStatistics m_sendThroughput;
@@ -439,7 +438,7 @@ private:
 
 			// 4. update client address
 			{
-				boost::mutex::scoped_lock lock(m_clientAddressMutex);
+				std::unique_lock<std::mutex> lock(m_clientAddressMutex);
 				m_clientAddress = m_postOffice->GetClientAddress();
 			}
 
@@ -553,7 +552,7 @@ private:
 	}
 };
 
-boost::shared_ptr<slaim::PostOffice> CreatePostOffice(PostOfficeInitializer& initializer, const char* clientIdentifier) {
+std::shared_ptr<slaim::PostOffice> CreatePostOffice(PostOfficeInitializer& initializer, const char* clientIdentifier) {
 	std::string host = initializer.GetMessagingServerHost();
 	int port = initializer.GetMessagingServerPort();
 
@@ -568,7 +567,7 @@ boost::shared_ptr<slaim::PostOffice> CreatePostOffice(PostOfficeInitializer& ini
 	oss << ":" << port;
 	std::string connectInfo = oss.str();
 
-	boost::shared_ptr<slaim::ExtendedPostOffice> bpo(new num0w::PostOffice(connectInfo, clientIdentifier));
+	std::shared_ptr<slaim::ExtendedPostOffice> bpo(new num0w::PostOffice(connectInfo, clientIdentifier));
 
 	//bpo->SetConnectInfo(connectInfo);
 	if (clientIdentifier) {
@@ -579,7 +578,7 @@ boost::shared_ptr<slaim::PostOffice> CreatePostOffice(PostOfficeInitializer& ini
 
 	if (isBuffered) {
 		claim::BufferedPostOffice* ppo = new claim::BufferedPostOffice(bpo, initializer);
-		boost::shared_ptr<slaim::PostOffice> cpo(ppo);
+		std::shared_ptr<slaim::PostOffice> cpo(ppo);
 		return cpo;
 	}
 	else {
@@ -587,7 +586,7 @@ boost::shared_ptr<slaim::PostOffice> CreatePostOffice(PostOfficeInitializer& ini
 	}
 }
 
-BufferedPostOffice::BufferedPostOffice(boost::shared_ptr<slaim::ExtendedPostOffice> postOffice, PostOfficeInitializer& initializer)
+BufferedPostOffice::BufferedPostOffice(std::shared_ptr<slaim::ExtendedPostOffice> postOffice, PostOfficeInitializer& initializer)
 {
 	m_postOffice = postOffice;
 
@@ -611,7 +610,7 @@ std::string PrettyPostOfficeVersion(const char* szInput) {
 
 class PostOffice::Impl {
 public:
-	boost::shared_ptr<slaim::PostOffice> postOffice;
+	std::shared_ptr<slaim::PostOffice> postOffice;
 };
 
 PostOffice::PostOffice()
