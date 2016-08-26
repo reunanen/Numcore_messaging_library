@@ -10,7 +10,7 @@
 #define CLAIM_THROUGHPUT_STATISTICS_H
 
 #include <numcfc/Time.h>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <deque>
 
 namespace claim {
@@ -23,14 +23,14 @@ public:
 	}
 
 	void AddThroughput(size_t bytes) {
-		boost::mutex::scoped_lock lock(m_mutex);
+		std::unique_lock<std::mutex> lock(m_mutex);
 		Maintain();
 		numcfc::TimeElapsed te;
 		te.ResetToCurrent();
 		m_throughputStatistics.push_back(std::make_pair(te, bytes));
 	}
 	std::pair<double, double> GetThroughputPerSec() {
-		boost::mutex::scoped_lock lock(m_mutex);
+		std::unique_lock<std::mutex> lock(m_mutex);
 		Maintain();
 		std::pair<double, double> p;
 		p.first = m_throughputStatistics.size() / m_windowLength;
@@ -53,7 +53,7 @@ private:
 			}
 		}
 	}
-	boost::mutex m_mutex;
+	std::mutex m_mutex;
 	std::deque< std::pair<numcfc::TimeElapsed, size_t> > m_throughputStatistics; // first: item count, second: total bytes
 	double m_windowLength;
 };

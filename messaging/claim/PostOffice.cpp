@@ -24,6 +24,7 @@
 
 #include <deque>
 #include <mutex>
+#include <sstream>
 
 #ifdef WIN32
 //#ifdef _DEBUG

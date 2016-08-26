@@ -8,13 +8,11 @@
 
 #include "ThreadRunner.h"
 #include "Time.h"
-#include <boost/thread/thread.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
 
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/recursive_mutex.hpp>
-#include <boost/thread/condition_variable.hpp>
+#include <map>
+#include <chrono>
+#include <mutex>
+#include <condition_variable>
 
 namespace numcfc {
 
@@ -29,14 +27,14 @@ public:
 		m_notified = rhs.m_notified;
 		m_supposedToStop = rhs.m_supposedToStop;
 		
-		boost::mutex::scoped_lock lockRhs(rhs.m_threadObjectMutex);
-		boost::mutex::scoped_lock lock(m_threadObjectMutex);
+		std::unique_lock<std::mutex> lockRhs(rhs.m_threadObjectMutex);
+		std::unique_lock<std::mutex> lock(m_threadObjectMutex);
 		m_spThread = rhs.m_spThread;
 	}
 
 	void Wait()
 	{
-		boost::unique_lock<boost::mutex> lock(m_mutex);
+		std::unique_lock<std::mutex> lock(m_mutex);
 		while (!m_notified) {
 			m_condition.wait(lock);
 		}
@@ -46,14 +44,13 @@ public:
 	bool Wait(double maxNumberOfSecondsToWait)
 	{
 		numcfc::TimeElapsed te;
-		boost::unique_lock<boost::mutex> lock(m_mutex);
+		std::unique_lock<std::mutex> lock(m_mutex);
 		while (!m_notified && te.GetElapsedSeconds() < maxNumberOfSecondsToWait) {
 			double maxWaitTime = maxNumberOfSecondsToWait - te.GetElapsedSeconds();
 			if (maxWaitTime < 0) {
 				maxWaitTime = 0;
 			}
-			boost::posix_time::time_duration td = boost::posix_time::microseconds(static_cast<boost::int64_t>(maxWaitTime * 1e6));
-			m_condition.timed_wait(lock, td);
+			m_condition.wait_for(lock, std::chrono::microseconds(static_cast<int>(maxWaitTime * 1e6)));
 		}
 		bool retVal = m_notified;
 		m_notified = false;
@@ -63,7 +60,7 @@ public:
 	void Notify()
 	{
 		{
-			boost::lock_guard<boost::mutex> lock(m_mutex);
+			std::lock_guard<std::mutex> lock(m_mutex);
 			m_notified = true;
 		}
 		m_condition.notify_one();	
@@ -71,9 +68,9 @@ public:
 
 	bool Join()
 	{
-		boost::shared_ptr<boost::thread> spThread;
+		std::shared_ptr<std::thread> spThread;
 		{
-			boost::mutex::scoped_lock lock(m_threadObjectMutex);
+			std::unique_lock<std::mutex> lock(m_threadObjectMutex);
 			spThread = m_spThread;
 		}
 
@@ -87,13 +84,13 @@ public:
 		}
 	}
 
-	mutable boost::mutex m_threadObjectMutex;
-	boost::shared_ptr<boost::thread> m_spThread;
+	mutable std::mutex m_threadObjectMutex;
+	std::shared_ptr<std::thread> m_spThread;
 	bool m_supposedToStop;
 	
 private:
-	boost::mutex m_mutex;
-	boost::condition_variable m_condition;
+	std::mutex m_mutex;
+	std::condition_variable m_condition;
 
 	bool m_notified;
 };
@@ -112,11 +109,11 @@ ThreadRunner::~ThreadRunner()
 
 bool ThreadRunner::StartThread()
 {
-	boost::mutex::scoped_lock lock(pimpl_->m_threadObjectMutex);
+	std::unique_lock<std::mutex> lock(pimpl_->m_threadObjectMutex);
 
 	if (pimpl_->m_spThread.get() == NULL) {
 		pimpl_->m_supposedToStop = false;
-		boost::shared_ptr<boost::thread> spThread(new boost::thread(RunThread, boost::ref(*this)));
+		std::shared_ptr<std::thread> spThread(new std::thread(RunThread, std::ref(*this)));
 		pimpl_->m_spThread = spThread;
 		return true;
 	}
@@ -127,11 +124,11 @@ bool ThreadRunner::StartThread()
 
 void ThreadRunner::RunThread(ThreadRunner& threadRunner)
 {
-	boost::posix_time::ptime ptThreadStarted = boost::posix_time::microsec_clock::universal_time();
-	boost::shared_ptr<boost::thread> spThread;
+	const auto threadStartTime = std::chrono::high_resolution_clock::now();
+	std::shared_ptr<std::thread> spThread;
 		
 	{
-		boost::mutex::scoped_lock lock(threadRunner.pimpl_->m_threadObjectMutex);
+		std::unique_lock<std::mutex> lock(threadRunner.pimpl_->m_threadObjectMutex);
 		spThread = threadRunner.pimpl_->m_spThread; // keep a reference...
 	}
 
@@ -143,14 +140,14 @@ void ThreadRunner::RunThread(ThreadRunner& threadRunner)
 	}
 
 	{
-		boost::mutex::scoped_lock lock(threadRunner.pimpl_->m_threadObjectMutex);
+		std::unique_lock<std::mutex> lock(threadRunner.pimpl_->m_threadObjectMutex);
 		threadRunner.pimpl_->m_spThread.reset();
 	}
 }
 
 bool ThreadRunner::AskThreadToStop()
 {
-	boost::mutex::scoped_lock lock(pimpl_->m_threadObjectMutex);
+	std::unique_lock<std::mutex> lock(pimpl_->m_threadObjectMutex);
 	if (pimpl_->m_spThread.get() != NULL) {
 		pimpl_->m_supposedToStop = true;
 		pimpl_->Notify();
@@ -213,9 +210,9 @@ bool MultiThreadRunner::StartThread(const std::string& threadTask)
 	Impl::ThreadImpls::iterator i = pimpl_->m_threads.find(threadTask);
 	if (i == pimpl_->m_threads.end()) {
 		ThreadRunner::Impl& entry = pimpl_->m_threads[threadTask];
-		boost::shared_ptr<boost::thread> spThread(new boost::thread(RunThread, boost::ref(*this), threadTask));
+		std::shared_ptr<std::thread> spThread(new std::thread(RunThread, std::ref(*this), threadTask));
 
-		boost::mutex::scoped_lock lock(entry.m_threadObjectMutex);
+		std::unique_lock<std::mutex> lock(entry.m_threadObjectMutex);
 		entry.m_spThread = spThread;
 		return entry.m_spThread.get() != NULL;
 	}
@@ -226,7 +223,7 @@ bool MultiThreadRunner::StartThread(const std::string& threadTask)
 
 void MultiThreadRunner::RunThread(MultiThreadRunner& threadRunner, const std::string& threadTask)
 {
-	boost::posix_time::ptime ptThreadStarted = boost::posix_time::microsec_clock::universal_time();
+	const auto threadStartTime = std::chrono::high_resolution_clock::now();
 	try {
 		threadRunner.operator ()(threadTask);
 	}
