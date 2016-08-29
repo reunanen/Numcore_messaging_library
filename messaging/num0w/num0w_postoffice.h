@@ -76,7 +76,9 @@ public:
 	//* May be called from any thread.
 	virtual void Activity();
 
+#ifdef _DEBUG
 	virtual void RegisterWorkerThread();
+#endif // DEBUG
 
 private:
 	void Register();
