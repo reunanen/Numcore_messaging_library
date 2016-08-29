@@ -24,6 +24,13 @@
 
 #define UNUSED(x) (void)(x)
 
+#ifdef WIN32
+#define USE_NONBOUND_SIGNALING_SOCKET
+#else // WIN32
+// TODO: implement the self-pipe trick
+//       see: https://github.com/reunanen/Numcore_messaging_library/blob/c23ad1f1e7f613b29257de2a3184a7b9203c08f6/messaging/numsprew/signaling_select.cpp
+#endif // WIN32
+
 namespace num0w {
 
 using namespace slaim;
@@ -37,17 +44,44 @@ class PostOffice::Pimpl {
 public:
     Pimpl() 
         : dealer(context, ZMQ_DEALER)
+#ifdef USE_NONBOUND_SIGNALING_SOCKET
+        , signalNonboundSocket(socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP))
+#else
         , signalingListener(context, ZMQ_ROUTER)
+#endif
     {}
+
+    ~Pimpl() {
+#ifdef USE_NONBOUND_SIGNALING_SOCKET
+        if (signalNonboundSocket != -1) {
+            closesocket(signalNonboundSocket);
+            signalNonboundSocket = -1;
+        }
+#endif // USE_NONBOUND_SIGNALING_SOCKET
+    }
+
+#ifdef USE_NONBOUND_SIGNALING_SOCKET
+    void RecreateSignalingSocket()
+    {
+        closesocket(signalNonboundSocket); // Probably already closed by Activity(), but this shouldn't do harm either.
+        signalNonboundSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    }
+#endif // USE_NONBOUND_SIGNALING_SOCKET
 
 #ifdef _DEBUG
     std::thread::id workerThreadId;
 #endif
 
     zmq::context_t context;
-    zmq::socket_t dealer, signalingListener;
+    zmq::socket_t dealer;
     std::chrono::time_point<std::chrono::high_resolution_clock> timeHeartbeatLastSent = std::chrono::high_resolution_clock::now();
     std::chrono::time_point<std::chrono::high_resolution_clock> timeLastRegistered = std::chrono::high_resolution_clock::now();
+
+#ifdef USE_NONBOUND_SIGNALING_SOCKET
+    SOCKET signalNonboundSocket;
+#else
+    zmq::socket_t signalingListener;
+#endif
 };
 
 PostOffice::PostOffice(const std::string& connectString, const char* clientIdentifier)
@@ -71,7 +105,9 @@ PostOffice::PostOffice(const std::string& connectString, const char* clientIdent
 
     pimpl_->dealer.connect(m_connectString);
 
+#ifndef USE_NONBOUND_SIGNALING_SOCKET
     pimpl_->signalingListener.bind(activitySignalingAddress);
+#endif // USE_NONBOUND_SIGNALING_SOCKET
 
     Register();
 }
@@ -82,7 +118,9 @@ PostOffice::~PostOffice()
     pimpl_->dealer.setsockopt(ZMQ_LINGER, &one, sizeof one);
     pimpl_->dealer.close();
 
+#ifndef USE_NONBOUND_SIGNALING_SOCKET
     pimpl_->signalingListener.close();
+#endif // USE_NONBOUND_SIGNALING_SOCKET
 
     delete pimpl_;
 }
@@ -276,13 +314,47 @@ bool PostOffice::WaitForActivity(double maxSecondsToWait)
     assert(std::this_thread::get_id() == pimpl_->workerThreadId);
 #endif
 
+#ifdef USE_NONBOUND_SIGNALING_SOCKET
+    {
+        // Check the condition of the non-bound signaling socket.
+        fd_set rfds;
+        FD_ZERO(&rfds);
+
+        FD_SET(pimpl_->signalNonboundSocket, &rfds);
+        size_t nfds = pimpl_->signalNonboundSocket + 1;
+
+        struct timeval tv;
+        tv.tv_sec = tv.tv_usec = 0;
+        int retval = select(static_cast<int>(nfds), &rfds, NULL, &rfds, &tv);
+        if (retval > 0) {
+            // Shouldn't normally happen (?), because the select() timeout is zero.
+            pimpl_->RecreateSignalingSocket();
+            return true;
+        }
+        else if (retval == -1) {
+            int err = GetLastError();
+            {
+                // The non-bound signaling socket was closed by an Activity() call in between WaitForActivity() calls.
+                pimpl_->RecreateSignalingSocket();
+                return true;
+            }
+        }
+    }
+#endif
+
     zmq::pollitem_t pollItems[2];
     pollItems[0].socket = pimpl_->dealer;
     pollItems[0].fd = 0;
     pollItems[0].events = ZMQ_POLLIN;
     pollItems[0].revents = 0;
+
+#ifdef USE_NONBOUND_SIGNALING_SOCKET
+    pollItems[1].socket = 0;
+    pollItems[1].fd = pimpl_->signalNonboundSocket;
+#else
     pollItems[1].socket = pimpl_->signalingListener;
     pollItems[1].fd = 0;
+#endif
     pollItems[1].events = ZMQ_POLLIN;
     pollItems[1].revents = 0;
 
@@ -294,6 +366,10 @@ bool PostOffice::WaitForActivity(double maxSecondsToWait)
         hasIncomingSignalingMessage = pollResult && (pollItems[1].revents & ZMQ_POLLIN);
 
         if (hasIncomingSignalingMessage) {
+#ifdef USE_NONBOUND_SIGNALING_SOCKET
+            // The non-bound signaling socket was closed by Activity() while we were in select().
+            pimpl_->RecreateSignalingSocket();
+#else // USE_NONBOUND_SIGNALING_SOCKET
             // Receive, and forget, the activity signaling message.
             zmq::message_t msgClientId, msgPayload;
             const bool receivedClientId = pimpl_->signalingListener.recv(&msgClientId, ZMQ_NOBLOCK);
@@ -306,11 +382,16 @@ bool PostOffice::WaitForActivity(double maxSecondsToWait)
 #ifndef _DEBUG
             UNUSED(receivedClientId);
             UNUSED(receivedPayload);
-#endif
+#endif // _DEBUG
+#endif // USE_NONBOUND_SIGNALING_SOCKET
 
             // Reset.
             pollItems[1].revents = 0;
         }
+
+#ifdef USE_NONBOUND_SIGNALING_SOCKET
+        hasIncomingSignalingMessage = false;
+#endif
     } while (hasIncomingSignalingMessage);
     
     return pollResult && pollItems[0].revents;
@@ -321,17 +402,19 @@ void PostOffice::Activity()
     // This looks expensive, but hopefully it is not.
     // See: http://grokbase.com/t/zeromq/zeromq-dev/13774wpwy7/how-expensive-is-an-inproc-connect
 
+#ifdef USE_NONBOUND_SIGNALING_SOCKET
+    // Simulate activity in order to make it possible for a
+    // thread in WaitForActivity to immediately wake up.
+    closesocket(pimpl_->signalNonboundSocket);
+#else // USE_NONBOUND_SIGNALING_SOCKET
     zmq::socket_t signalingSocket(pimpl_->context, ZMQ_DEALER);
     signalingSocket.connect(activitySignalingAddress);
 
     zmq::message_t request(activitySignalingPayload.data(), activitySignalingPayload.length());
     signalingSocket.send(request);
 
-#ifndef _DEBUG
-    UNUSED(receivedReply);
-#endif
-
     signalingSocket.close();
+#endif // USE_NONBOUND_SIGNALING_SOCKET
 }
 
 #ifdef _DEBUG
