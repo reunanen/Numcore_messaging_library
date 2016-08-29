@@ -316,6 +316,19 @@ bool PostOffice::WaitForActivity(double maxSecondsToWait)
 
 #ifdef USE_NONBOUND_SIGNALING_SOCKET
     {
+        // Short-circuit based on actual dealer activity.
+        zmq::pollitem_t pollItem;
+        pollItem.socket = pimpl_->dealer;
+        pollItem.fd = 0;
+        pollItem.events = ZMQ_POLLIN;
+        pollItem.revents = 0;
+
+        if (zmq_poll(&pollItem, 1, 0) > 0) {
+            return true;
+        }
+    }
+
+    {
         // Check the condition of the non-bound signaling socket.
         fd_set rfds;
         FD_ZERO(&rfds);
@@ -362,8 +375,16 @@ bool PostOffice::WaitForActivity(double maxSecondsToWait)
     bool hasIncomingSignalingMessage = false;
 
     do {
-        pollResult = zmq::poll(pollItems, 2, static_cast<long>(maxSecondsToWait * 1000));
-        hasIncomingSignalingMessage = pollResult && (pollItems[1].revents & ZMQ_POLLIN);
+        pollResult = zmq_poll(pollItems, 2, static_cast<long>(maxSecondsToWait * 1000));
+        if (pollResult < 0) {
+            if (pollResult != EINTR) {
+                std::ostringstream errorMessage;
+                errorMessage << "Unexpected error from zmq_poll: " << pollResult;
+                SetError(errorMessage.str());
+            }
+        }
+
+        hasIncomingSignalingMessage = (pollResult > 0) && (pollItems[1].revents & ZMQ_POLLIN);
 
         if (hasIncomingSignalingMessage) {
 #ifdef USE_NONBOUND_SIGNALING_SOCKET
@@ -394,7 +415,7 @@ bool PostOffice::WaitForActivity(double maxSecondsToWait)
 #endif
     } while (hasIncomingSignalingMessage);
     
-    return pollResult && pollItems[0].revents;
+    return (pollResult > 0) && (pollItems[0].revents & ZMQ_POLLIN);
 }
 
 void PostOffice::Activity()
