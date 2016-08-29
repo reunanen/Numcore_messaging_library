@@ -173,9 +173,10 @@ bool PostOffice::Receive(Message& msg, double maxSecondsToWait)
 
     const auto t0 = std::chrono::high_resolution_clock::now();
 
-    const auto secondsRemaining = [&t0]() {
+    const auto secondsRemaining = [&t0, maxSecondsToWait]() {
         const auto now = std::chrono::high_resolution_clock::now();
-        return (std::max)(0.0, std::chrono::duration_cast<std::chrono::microseconds>(now - t0).count() * 1e-6);
+        const double secondsElapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - t0).count() * 1e-6;
+        return (std::max)(0.0, maxSecondsToWait - secondsElapsed);
     };
 
     while (WaitForActivity(secondsRemaining())) {
