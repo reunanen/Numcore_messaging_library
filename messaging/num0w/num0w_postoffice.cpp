@@ -22,6 +22,8 @@
 #include <thread>
 #endif // _DEBUG
 
+#define UNUSED(x) (void)(x)
+
 namespace num0w {
 
 using namespace slaim;
@@ -301,6 +303,11 @@ bool PostOffice::WaitForActivity(double maxSecondsToWait)
             const std::string payloadContent = std::string(msgPayload.data<char>(), msgPayload.data<char>() + msgPayload.size());
             assert(activitySignalingPayload == payloadContent);
 
+#ifndef _DEBUG
+            UNUSED(receivedClientId);
+            UNUSED(receivedPayload);
+#endif
+
             // Send a reply to the signaler.
             pimpl_->signalingListener.send(msgClientId, ZMQ_SNDMORE);
             pimpl_->signalingListener.send(msgPayload, 0);
@@ -330,6 +337,10 @@ void PostOffice::Activity()
     assert(receivedReply);
     const std::string payloadContent = std::string(reply.data<char>(), reply.data<char>() + reply.size());
     assert(activitySignalingPayload == payloadContent);
+
+#ifndef _DEBUG
+    UNUSED(receivedReply);
+#endif
 
     signalingSocket.close();
 }
