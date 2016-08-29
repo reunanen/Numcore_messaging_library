@@ -16,21 +16,34 @@
 #include <cstring>
 #include <sstream>
 #include <fstream>
-#include <algorithm> // std::min
 #include <chrono>
+
+#ifdef _DEBUG
+#include <thread>
+#endif // _DEBUG
 
 namespace num0w {
 
 using namespace slaim;
 
+namespace {
+    const char* activitySignalingAddress = "inproc://activity-signaling";
+    const std::string activitySignalingPayload = "activity";
+}
+
 class PostOffice::Pimpl {
 public:
     Pimpl() 
         : dealer(context, ZMQ_DEALER)
+        , signalingListener(context, ZMQ_ROUTER)
     {}
-    
+
+#ifdef _DEBUG
+    std::thread::id workerThreadId;
+#endif
+
     zmq::context_t context;
-    zmq::socket_t dealer;
+    zmq::socket_t dealer, signalingListener;
     std::chrono::time_point<std::chrono::high_resolution_clock> timeHeartbeatLastSent = std::chrono::high_resolution_clock::now();
     std::chrono::time_point<std::chrono::high_resolution_clock> timeLastRegistered = std::chrono::high_resolution_clock::now();
 };
@@ -56,6 +69,8 @@ PostOffice::PostOffice(const std::string& connectString, const char* clientIdent
 
     pimpl_->dealer.connect(m_connectString);
 
+    pimpl_->signalingListener.bind(activitySignalingAddress);
+
     Register();
 }
 
@@ -64,12 +79,15 @@ PostOffice::~PostOffice()
     int one = 1;
     pimpl_->dealer.setsockopt(ZMQ_LINGER, &one, sizeof one);
     pimpl_->dealer.close();
-	delete pimpl_;
+
+    pimpl_->signalingListener.close();
+
+    delete pimpl_;
 }
 
 const char* PostOffice::GetVersion() const
 {
-    return "2.0 - " __TIMESTAMP__;
+    return "2.1 - " __TIMESTAMP__;
 }
 
 std::string ToString(const zmq::message_t& message)
@@ -153,29 +171,14 @@ bool PostOffice::Receive(Message& msg, double maxSecondsToWait)
 		return false;
 	}
 
-    const auto poll = [&]() {
-        zmq::pollitem_t pollItem;
-        pollItem.socket = pimpl_->dealer;
-        pollItem.events = ZMQ_POLLIN;
-
-        return zmq::poll(&pollItem, 1, static_cast<long>(maxSecondsToWait * 1000)) > 0;
-    };
-
     const auto t0 = std::chrono::high_resolution_clock::now();
 
-    const auto waitedTooLong = [&]() {
+    const auto secondsRemaining = [&t0]() {
         const auto now = std::chrono::high_resolution_clock::now();
-        return std::chrono::duration_cast<std::chrono::milliseconds>(now - t0).count() >= maxSecondsToWait * 1000;
+        return (std::max)(0.0, std::chrono::duration_cast<std::chrono::microseconds>(now - t0).count() * 1e-6);
     };
 
-    int pollResult = poll();
-
-    if (!pollResult && !waitedTooLong()) {
-        WaitForActivity(maxSecondsToWait);
-        pollResult = poll();
-    }
-
-    while (pollResult || !waitedTooLong()) {
+    while (WaitForActivity(secondsRemaining())) {
         zmq::message_t headerMessage;
         if (pimpl_->dealer.recv(&headerMessage, ZMQ_DONTWAIT)) {
             std::string header = ToString(headerMessage);
@@ -221,10 +224,8 @@ bool PostOffice::Receive(Message& msg, double maxSecondsToWait)
             }
         }
         else {
-            SetError("No message available, even though poll() returned true");
+            SetError("No message available, even though WaitForActivity() returned true");
         }
-
-        pollResult = poll();
     }
 
 	return false;
@@ -264,17 +265,79 @@ bool PostOffice::CheckConnection()
 	return IsMailboxOk();
 }
 
-bool PostOffice::WaitForActivity(double maxSecondsToWait) const
+// Returns true if there's a message to be received.
+bool PostOffice::WaitForActivity(double maxSecondsToWait)
 {
-    // TODO: add an in-proc socket and poll for it + the dealer socket
+#ifdef _DEBUG
+    // NOTE: In debug mode, the worker thread is supposed to register by calling RegisterWorkerThread().
+    assert(std::this_thread::get_id() == pimpl_->workerThreadId);
+#endif
 
-    sleep_minimal();
-    return true;
+    zmq::pollitem_t pollItems[2];
+    pollItems[0].socket = pimpl_->dealer;
+    pollItems[0].fd = 0;
+    pollItems[0].events = ZMQ_POLLIN;
+    pollItems[0].revents = 0;
+    pollItems[1].socket = pimpl_->signalingListener;
+    pollItems[1].fd = 0;
+    pollItems[1].events = ZMQ_POLLIN;
+    pollItems[1].revents = 0;
+
+    int pollResult = 0;
+    bool hasIncomingSignalingMessage = false;
+
+    do {
+        pollResult = zmq::poll(pollItems, 2, static_cast<long>(maxSecondsToWait * 1000));
+        hasIncomingSignalingMessage = pollResult && (pollItems[1].revents & ZMQ_POLLIN);
+
+        if (hasIncomingSignalingMessage) {
+            // Receive the activity signaling message.
+            zmq::message_t msgClientId, msgPayload;
+            const bool receivedClientId = pimpl_->signalingListener.recv(&msgClientId, ZMQ_NOBLOCK);
+            assert(receivedClientId);
+            const bool receivedPayload = pimpl_->signalingListener.recv(&msgPayload, ZMQ_NOBLOCK);
+            assert(receivedPayload);
+            const std::string payloadContent = std::string(msgPayload.data<char>(), msgPayload.data<char>() + msgPayload.size());
+            assert(activitySignalingPayload == payloadContent);
+
+            // Send a reply to the signaler.
+            pimpl_->signalingListener.send(msgClientId, ZMQ_SNDMORE);
+            pimpl_->signalingListener.send(msgPayload, 0);
+
+            // Reset.
+            pollItems[1].revents = 0;
+        }
+    } while (hasIncomingSignalingMessage);
+    
+    return pollResult && pollItems[0].revents;
 }
 
 void PostOffice::Activity()
 {
-    // TODO: send something to the abovementioned in-proc socket
+    // This looks expensive, but hopefully it is not.
+    // See: http://grokbase.com/t/zeromq/zeromq-dev/13774wpwy7/how-expensive-is-an-inproc-connect
+
+    zmq::socket_t signalingSocket(pimpl_->context, ZMQ_DEALER);
+    signalingSocket.connect(activitySignalingAddress);
+
+    zmq::message_t request(activitySignalingPayload.data(), activitySignalingPayload.length());
+    signalingSocket.send(request);
+
+    // Make sure there's a reply before the socket is closed in the end (note: is this really necessary? or useful?)
+    zmq::message_t reply;
+    const bool receivedReply = signalingSocket.recv(&reply);
+    assert(receivedReply);
+    const std::string payloadContent = std::string(reply.data<char>(), reply.data<char>() + reply.size());
+    assert(activitySignalingPayload == payloadContent);
+
+    signalingSocket.close();
 }
+
+#ifdef _DEBUG
+void PostOffice::RegisterWorkerThread()
+{
+    pimpl_->workerThreadId = std::this_thread::get_id();
+}
+#endif // _DEBUG
 
 }
