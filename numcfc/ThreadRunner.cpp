@@ -13,6 +13,7 @@
 #include <chrono>
 #include <mutex>
 #include <condition_variable>
+#include <assert.h>
 
 namespace numcfc {
 
@@ -22,14 +23,6 @@ public:
 	Impl() {
 		m_notified = false;
 		m_supposedToStop = false;
-	}
-	Impl(const Impl& rhs) {
-		m_notified = rhs.m_notified;
-		m_supposedToStop = rhs.m_supposedToStop;
-		
-		std::unique_lock<std::mutex> lockRhs(rhs.m_threadObjectMutex);
-		std::unique_lock<std::mutex> lock(m_threadObjectMutex);
-		m_spThread = rhs.m_spThread;
 	}
 
 	void Wait()
@@ -66,26 +59,20 @@ public:
 		m_condition.notify_one();	
 	}
 
-	bool Join()
+	void Join()
 	{
-		std::shared_ptr<std::thread> spThread;
-		{
-			std::unique_lock<std::mutex> lock(m_threadObjectMutex);
-			spThread = m_spThread;
-		}
-
-		if (spThread.get() != NULL) {
-			spThread->join();
-			//assert(m_spThread.get() == NULL); // doesn't necessarily hold when Ctrl-C'd
-			return true;
+		if (!m_joinedAlready) {
+			assert(m_thread.joinable());
+			m_thread.join();
+			m_joinedAlready = true;
 		}
 		else {
-			return false;
+			assert(!m_thread.joinable());
 		}
 	}
 
 	mutable std::mutex m_threadObjectMutex;
-	std::shared_ptr<std::thread> m_spThread;
+	std::thread m_thread;
 	bool m_supposedToStop;
 	
 private:
@@ -93,6 +80,7 @@ private:
 	std::condition_variable m_condition;
 
 	bool m_notified;
+	bool m_joinedAlready = false;
 };
 
 ThreadRunner::ThreadRunner()
@@ -107,55 +95,33 @@ ThreadRunner::~ThreadRunner()
 	delete pimpl_;
 }
 
-bool ThreadRunner::StartThread()
+void ThreadRunner::StartThread()
 {
 	std::unique_lock<std::mutex> lock(pimpl_->m_threadObjectMutex);
 
-	if (pimpl_->m_spThread.get() == NULL) {
-		pimpl_->m_supposedToStop = false;
-		std::shared_ptr<std::thread> spThread(new std::thread(RunThread, std::ref(*this)));
-		pimpl_->m_spThread = spThread;
-		return true;
-	}
-	else {
-		return false;
-	}
+	pimpl_->m_supposedToStop = false;
+	assert(!pimpl_->m_thread.joinable());
+
+	pimpl_->m_thread = std::thread(RunThread, std::ref(*this));
 }
 
 void ThreadRunner::RunThread(ThreadRunner& threadRunner)
 {
 	const auto threadStartTime = std::chrono::high_resolution_clock::now();
-	std::shared_ptr<std::thread> spThread;
 		
-	{
-		std::unique_lock<std::mutex> lock(threadRunner.pimpl_->m_threadObjectMutex);
-		spThread = threadRunner.pimpl_->m_spThread; // keep a reference...
-	}
-
 	try {
 		threadRunner.operator ()();
 	}
 	catch (...) {
 		;
 	}
-
-	{
-		std::unique_lock<std::mutex> lock(threadRunner.pimpl_->m_threadObjectMutex);
-		threadRunner.pimpl_->m_spThread.reset();
-	}
 }
 
-bool ThreadRunner::AskThreadToStop()
+void ThreadRunner::AskThreadToStop()
 {
 	std::unique_lock<std::mutex> lock(pimpl_->m_threadObjectMutex);
-	if (pimpl_->m_spThread.get() != NULL) {
-		pimpl_->m_supposedToStop = true;
-		pimpl_->Notify();
-		return true;
-	}
-	else {
-		return false;
-	}
+	pimpl_->m_supposedToStop = true;
+	pimpl_->Notify();
 }
 
 bool ThreadRunner::IsSupposedToStop() const
@@ -178,9 +144,9 @@ void ThreadRunner::Notify()
 	pimpl_->Notify();
 }
 
-bool ThreadRunner::JoinThread()
+void ThreadRunner::JoinThread()
 {
-	return pimpl_->Join();
+	pimpl_->Join();
 }
 
 
@@ -210,11 +176,10 @@ bool MultiThreadRunner::StartThread(const std::string& threadTask)
 	Impl::ThreadImpls::iterator i = pimpl_->m_threads.find(threadTask);
 	if (i == pimpl_->m_threads.end()) {
 		ThreadRunner::Impl& entry = pimpl_->m_threads[threadTask];
-		std::shared_ptr<std::thread> spThread(new std::thread(RunThread, std::ref(*this), threadTask));
 
 		std::unique_lock<std::mutex> lock(entry.m_threadObjectMutex);
-		entry.m_spThread = spThread;
-		return entry.m_spThread.get() != NULL;
+		entry.m_thread = std::thread(RunThread, std::ref(*this), threadTask);
+		return true;
 	}
 	else {
 		return false;
@@ -291,7 +256,8 @@ bool MultiThreadRunner::JoinThread(const std::string& threadTask)
 	Impl::ThreadImpls::iterator i = pimpl_->m_threads.find(threadTask);
 	if (i != pimpl_->m_threads.end()) {
 		ThreadRunner::Impl& entry = i->second;		
-		return entry.Join();
+		entry.Join();
+		return true;
 	}
 	else {
 		return false;

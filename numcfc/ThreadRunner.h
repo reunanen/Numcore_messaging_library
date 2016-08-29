@@ -21,12 +21,12 @@ public:
 
 	virtual void operator()() = 0;
 
-	bool StartThread();
-	bool AskThreadToStop();
+	void StartThread();
+	void AskThreadToStop();
 
 	bool IsSupposedToStop() const;
 
-	bool JoinThread();
+	void JoinThread();
 
 	void Wait();
 	bool Wait(double maxNumberOfSecondsToWait); // returns true if notified, false if max time reached
