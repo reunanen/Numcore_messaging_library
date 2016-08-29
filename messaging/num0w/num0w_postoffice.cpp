@@ -292,7 +292,7 @@ bool PostOffice::WaitForActivity(double maxSecondsToWait)
         hasIncomingSignalingMessage = pollResult && (pollItems[1].revents & ZMQ_POLLIN);
 
         if (hasIncomingSignalingMessage) {
-            // Receive the activity signaling message.
+            // Receive, and forget, the activity signaling message.
             zmq::message_t msgClientId, msgPayload;
             const bool receivedClientId = pimpl_->signalingListener.recv(&msgClientId, ZMQ_NOBLOCK);
             assert(receivedClientId);
@@ -300,10 +300,6 @@ bool PostOffice::WaitForActivity(double maxSecondsToWait)
             assert(receivedPayload);
             const std::string payloadContent = std::string(msgPayload.data<char>(), msgPayload.data<char>() + msgPayload.size());
             assert(activitySignalingPayload == payloadContent);
-
-            // Send a reply to the signaler.
-            pimpl_->signalingListener.send(msgClientId, ZMQ_SNDMORE);
-            pimpl_->signalingListener.send(msgPayload, 0);
 
             // Reset.
             pollItems[1].revents = 0;
@@ -323,13 +319,6 @@ void PostOffice::Activity()
 
     zmq::message_t request(activitySignalingPayload.data(), activitySignalingPayload.length());
     signalingSocket.send(request);
-
-    // Make sure there's a reply before the socket is closed in the end (note: is this really necessary? or useful?)
-    zmq::message_t reply;
-    const bool receivedReply = signalingSocket.recv(&reply);
-    assert(receivedReply);
-    const std::string payloadContent = std::string(reply.data<char>(), reply.data<char>() + reply.size());
-    assert(activitySignalingPayload == payloadContent);
 
     signalingSocket.close();
 }
