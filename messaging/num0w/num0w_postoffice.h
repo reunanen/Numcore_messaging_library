@@ -23,6 +23,9 @@ namespace num0w {
     Rather, it's been designed to be used as follows:
     <code>
         while (true) {
+#ifdef _DEBUG
+            po.RegisterWorkerThread();
+#endif
             slaim::Message msg;
             bool didSomething = false;
             while (po.Receive(msg)) {
@@ -67,11 +70,16 @@ public:
 
 	bool IsMailboxOk() const;
 
-	virtual bool WaitForActivity(double maxSecondsToWait) const;
+	//* NB: May be called from the registered worker thread only.
+	virtual bool WaitForActivity(double maxSecondsToWait);
+
+	//* May be called from any thread.
 	virtual void Activity();
 
+	virtual void RegisterWorkerThread();
+
 private:
-    void Register();
+	void Register();
 	bool CheckConnection();
 	void RegularOperations();
 

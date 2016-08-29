@@ -1,6 +1,7 @@
 
 //           Copyright 2007-2008 Juha Reunanen
 //                     2008-2011 Numcore Ltd
+//                     2016      Juha Reunanen
 //
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
@@ -84,7 +85,7 @@ public:
 	//	SendBufferAction action = SendBufferAction::CreateSetConnectInfoAction(connectString);
 	//	bool success = m_sendBuffer.push_back(action);
 	//	if (success) {
-	//		m_postOffice->Activity();			
+	//		m_postOffice->Activity();
 	//	}
 	//	else {
 	//		SetUnableToSendError("Set connect info");
@@ -100,7 +101,7 @@ public:
 		SendBufferAction action = SendBufferAction::CreateSetClientIdentifierAction(clientIdentifier);
 		bool success = m_sendBuffer.push_back(action);
 		if (success) {
-			m_postOffice->Activity();			
+			m_postOffice->Activity();
 		}
 		else {
 			SetUnableToSendError("Set client identifier");
@@ -348,6 +349,10 @@ private:
 		const int maxReceiveActivity = 100;
 
 		int sendActivity = 0, receiveActivity = 0;
+
+#ifdef _DEBUG
+		m_postOffice->RegisterWorkerThread();
+#endif // _DEBUG
 
 		while (!IsSupposedToStop()) {
 
