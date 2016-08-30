@@ -375,11 +375,9 @@ bool PostOffice::WaitForActivity(double maxSecondsToWait)
     do {
         pollResult = zmq_poll(pollItems, 2, static_cast<long>(maxSecondsToWait * 1000));
         if (pollResult < 0) {
-            if (pollResult != EINTR) {
-                std::ostringstream errorMessage;
-                errorMessage << "Unexpected error from zmq_poll: " << pollResult;
-                SetError(errorMessage.str());
-            }
+            std::ostringstream errorMessage;
+            errorMessage << "Error " << errno << " from zmq_poll.";
+            SetError(errorMessage.str());
         }
 
         hasIncomingSignalingMessage = (pollResult > 0) && (pollItems[1].revents & ZMQ_POLLIN);
