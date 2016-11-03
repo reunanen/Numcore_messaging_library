@@ -425,6 +425,7 @@ void PostOffice::Activity()
     // Simulate activity in order to make it possible for a
     // thread in WaitForActivity to immediately wake up.
     closesocket(pimpl_->signalNonboundSocket);
+    pimpl_->signalNonboundSocket = -1;
 #else // USE_NONBOUND_SIGNALING_SOCKET
     zmq::socket_t signalingSocket(pimpl_->context, ZMQ_DEALER);
     signalingSocket.connect(activitySignalingAddress);
