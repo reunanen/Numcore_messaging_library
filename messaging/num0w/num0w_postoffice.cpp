@@ -264,9 +264,6 @@ bool PostOffice::Receive(Message& msg, double maxSecondsToWait)
                 SetError("Sequence error: unexpected header " + header);
             }
         }
-        else {
-            SetError("No message available, even though WaitForActivity() returned true");
-        }
     }
 
 	return false;
