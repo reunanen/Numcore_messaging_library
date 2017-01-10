@@ -299,7 +299,6 @@
     <ClCompile Include="curl\lib\easy.c">
       <Filter>libcurl</Filter>
     </ClCompile>
-    <ClCompile Include="curl\lib\multi.c" />
     <ClCompile Include="curl\lib\share.c">
       <Filter>libcurl</Filter>
     </ClCompile>
@@ -376,6 +375,9 @@
       <Filter>libcurl\vauth</Filter>
     </ClCompile>
     <ClCompile Include="curl\lib\ldap.c">
+      <Filter>libcurl</Filter>
+    </ClCompile>
+    <ClCompile Include="curl\lib\multi.c">
       <Filter>libcurl</Filter>
     </ClCompile>
   </ItemGroup>
