@@ -26,6 +26,8 @@ int main(int argc, char* argv[])
 
     const std::string db = iniFile.GetSetValue("InfluxDB", "Database", "db");
 
+    const std::string retention = iniFile.GetSetValue("InfluxDB", "Retention", "4w", "See https://docs.influxdata.com/influxdb/v0.9/query_language/database_management/#retention-policy-management");
+
     numcfc::Logger::LogAndEcho("Writing to: " + url + " : " + db);
 
     if (iniFile.IsDirty()) {
@@ -50,7 +52,18 @@ int main(int argc, char* argv[])
 
     auto result = curl_easy_perform(curl);
     if (result != CURLE_OK) {
-        numcfc::Logger::LogAndEcho("curl_easy_perform() failed: " + std::string(curl_easy_strerror(result)), "log_error");
+        numcfc::Logger::LogAndEcho("Creating a database failed: " + std::string(curl_easy_strerror(result)), "log_error");
+    }
+
+    // create retention policy
+    const std::string createRetentionPolicy = "q=CREATE RETENTION POLICY default_retention_policy ON " + db + " DURATION " + retention + " REPLICATION 1 DEFAULT";
+
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, createRetentionPolicy.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, createRetentionPolicy.length());
+
+    result = curl_easy_perform(curl);
+    if (result != CURLE_OK) {
+        numcfc::Logger::LogAndEcho("Creating a retention policy failed: " + std::string(curl_easy_strerror(result)), "log_error");
     }
 
     // write data
@@ -69,7 +82,7 @@ int main(int argc, char* argv[])
 
                     auto result = curl_easy_perform(curl);
                     if (result != CURLE_OK) {
-                        numcfc::Logger::LogAndEcho("curl_easy_perform() failed: " + std::string(curl_easy_strerror(result)), "log_error");
+                        numcfc::Logger::LogAndEcho("Writing data failed: " + std::string(curl_easy_strerror(result)), "log_error");
                     }
                 }
             }
