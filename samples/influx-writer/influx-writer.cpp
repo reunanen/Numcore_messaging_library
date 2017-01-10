@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
 
     while (true) {
         slaim::Message msg;
-        while (postOffice.Receive(msg, 0.0)) {
+        while (postOffice.Receive(msg, 1.0)) {
             if (msg.GetType() == "influx-output") {
                 claim::AttributeMessage amsg(msg);
                 for (const auto& attribute : amsg.m_attributes) {
