@@ -55,17 +55,6 @@ int main(int argc, char* argv[])
         numcfc::Logger::LogAndEcho("Creating a database failed: " + std::string(curl_easy_strerror(result)), "log_error");
     }
 
-    // drop the retention policy in case it already exists
-    const std::string dropRetentionPolicy = "q=DROP RETENTION POLICY default_retention_policy ON " + db;
-
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, dropRetentionPolicy.c_str());
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, dropRetentionPolicy.length());
-
-    result = curl_easy_perform(curl);
-    if (result != CURLE_OK) {
-        // ok - no existing retention policy
-    }
-
     // create a new retention policy
     const std::string createRetentionPolicy = "q=CREATE RETENTION POLICY default_retention_policy ON " + db + " DURATION " + retention + " REPLICATION 1 DEFAULT";
 
@@ -74,7 +63,16 @@ int main(int argc, char* argv[])
 
     result = curl_easy_perform(curl);
     if (result != CURLE_OK) {
-        numcfc::Logger::LogAndEcho("Creating a new retention policy failed: " + std::string(curl_easy_strerror(result)), "log_error");
+        // probably the retention policy already exists - try to modify it
+        const std::string alterRetentionPolicy = "q=ALTER RETENTION POLICY default_retention_policy ON " + db + " DURATION " + retention + " REPLICATION 1 DEFAULT";
+
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, alterRetentionPolicy.c_str());
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, alterRetentionPolicy.length());
+
+        result = curl_easy_perform(curl);
+        if (result != CURLE_OK) {
+            numcfc::Logger::LogAndEcho("Creating and modifying a new retention policy failed: " + std::string(curl_easy_strerror(result)), "log_error");
+        }
     }
 
     // write data
