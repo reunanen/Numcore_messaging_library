@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 	numcfc::IniFile iniFile("influx-writer.ini");
 
     claim::PostOffice postOffice;
-    postOffice.Initialize(iniFile);
+    postOffice.Initialize(iniFile, "ifw");
 
     postOffice.Subscribe("influx-output");
 
