@@ -7,8 +7,11 @@
 #include <messaging/claim/PostOffice.h>
 #include <messaging/claim/AttributeMessage.h>
 #include <numcfc/Logger.h>
+#include <numcfc/Time.h>
 
 #include <curl/curl.h>
+
+#include <unordered_map>
 
 int main(int argc, char* argv[])
 {
@@ -79,21 +82,35 @@ int main(int argc, char* argv[])
     curl_easy_setopt(curl, CURLOPT_URL, (url + "write?db=" + db).c_str());
 
     while (true) {
+        std::unordered_map<std::string, std::string> valuesToWrite;
         slaim::Message msg;
-        while (postOffice.Receive(msg, 1.0)) {
+
+        const auto timeout = [&valuesToWrite]() {
+            return valuesToWrite.empty() ? 1.0 : 0.0;
+        };
+ 
+        while (postOffice.Receive(msg, timeout())) {
             if (msg.GetType() == "influx-output") {
                 claim::AttributeMessage amsg(msg);
                 for (const auto& attribute : amsg.m_attributes) {
-                    const std::string write = attribute.first + " value=" + attribute.second;
-
-                    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, write.c_str());
-                    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, write.length());
-
-                    auto result = curl_easy_perform(curl);
-                    if (result != CURLE_OK) {
-                        numcfc::Logger::LogAndEcho("Writing data failed: " + std::string(curl_easy_strerror(result)), "log_error");
-                    }
+                    valuesToWrite[attribute.first] = attribute.second;
                 }
+            }
+        }
+
+        if (!valuesToWrite.empty()) {
+            std::string write;
+            
+            for (const auto& valueToWrite : valuesToWrite) {
+                write += valueToWrite.first + " value=" + valueToWrite.second + "\n";
+            }
+
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, write.c_str());
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, write.length());
+
+            auto result = curl_easy_perform(curl);
+            if (result != CURLE_OK) {
+                numcfc::Logger::LogAndEcho("Writing data failed: " + std::string(curl_easy_strerror(result)), "log_error");
             }
         }
     }
