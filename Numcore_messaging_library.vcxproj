@@ -72,23 +72,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir);messaging\num0w\libzmq\include;\Local\boost_1_56_0;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>$(SolutionDir)$(Platform)/$(Configuration)StaticRuntime;\Local\boost_1_56_0\stage\lib\x86;\Local\spread-src-4.4.0\lib\win32\Debug;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
+    <IncludePath>messaging\num0w\libzmq\include;.;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(SolutionDir)$(Platform)/$(Configuration)StaticRuntime;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir);messaging\num0w\libzmq\include;\Local\boost_1_56_0;\Local\spread-src-4.4.0\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>$(SolutionDir)$(Platform)/$(Configuration)StaticRuntime;\Local\boost_1_56_0\stage\lib\x64;\Local\spread-src-4.4.0\win32\x64\Debug;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);</LibraryPath>
+    <IncludePath>messaging\num0w\libzmq\include;.;\Local\spread-src-4.4.0\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(SolutionDir)$(Platform)/$(Configuration)StaticRuntime;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);messaging\num0w\libzmq\include;\Local\boost_1_56_0;\Local\spread-src-4.4.0\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>$(SolutionDir)$(Platform)/$(Configuration)StaticRuntime;\Local\boost_1_56_0\stage\lib\x86;\Local\spread-src-4.4.0\lib\win32\Release;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
+    <IncludePath>messaging\num0w\libzmq\include;.;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(SolutionDir)$(Platform)/$(Configuration)StaticRuntime;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);messaging\num0w\libzmq\include;\Local\boost_1_56_0;\Local\spread-src-4.4.0\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>$(SolutionDir)$(Platform)/$(Configuration)StaticRuntime;\Local\boost_1_56_0\stage\lib\x64;\Local\spread-src-4.4.0\win32\x64\Release;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);</LibraryPath>
+    <IncludePath>messaging\num0w\libzmq\include;.;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(SolutionDir)$(Platform)/$(Configuration)StaticRuntime;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -103,7 +103,7 @@
       <AdditionalDependencies />
     </Link>
     <Lib>
-      <AdditionalDependencies>libzmq.lib;advapi32.lib;ws2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>libzmq.lib;advapi32.lib;ws2_32.lib;Iphlpapi.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -120,7 +120,7 @@
       </AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalDependencies>libzmq.lib;advapi32.lib;ws2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>libzmq.lib;advapi32.lib;ws2_32.lib;Iphlpapi.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -135,7 +135,7 @@
       <AdditionalDependencies />
     </Link>
     <Lib>
-      <AdditionalDependencies>libzmq.lib;advapi32.lib;ws2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>libzmq.lib;advapi32.lib;ws2_32.lib;Iphlpapi.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -151,7 +151,7 @@
       </AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalDependencies>libzmq.lib;advapi32.lib;ws2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>libzmq.lib;advapi32.lib;ws2_32.lib;Iphlpapi.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>

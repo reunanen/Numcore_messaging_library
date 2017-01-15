@@ -14,6 +14,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <assert.h>
+#include <thread>
 
 namespace numcfc {
 

@@ -61,8 +61,6 @@ private:
 	Impl* pimpl_;
 };
 
-std::string PrettyPostOfficeVersion(const char* szInput);
-
 }
 
 #endif // CLAIM_POSTOFFICE_H

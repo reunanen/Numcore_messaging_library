@@ -21,11 +21,11 @@
 
 #include <memory>
 #include <condition_variable>
-#include <boost/algorithm/string/replace.hpp>
 
 #include <deque>
 #include <mutex>
 #include <sstream>
+#include <assert.h>
 
 #ifdef WIN32
 //#ifdef _DEBUG
@@ -133,12 +133,7 @@ private:
 	void UpdateVersion() {
 		m_version = std::string("claimed<"); 
 		m_version += m_postOffice->GetVersion(); 
-		if (m_version.find(",") != std::string::npos) {
-			boost::algorithm::replace_first(m_version, ",", ">,");
-		}
-		else {
-			m_version += ">";
-		}
+		m_version += ">";
 	}
 
 	void ReadSettings(PostOfficeInitializer& initializer) {
@@ -604,14 +599,6 @@ BufferedPostOffice::BufferedPostOffice(std::shared_ptr<slaim::ExtendedPostOffice
 	m_timeStarted = now.ToExtendedISO();
 
 	StartThread();
-}
-
-std::string PrettyPostOfficeVersion(const char* szInput) {
-	std::string s = "   ";
-	s += szInput;
-	boost::algorithm::replace_all(s, ",", "\n     - ");
-	boost::algorithm::replace_all(s, "-  ", "- "); // remove an extra space due to the __TIMESTAMP__ macro
-	return s;
 }
 
 class PostOffice::Impl {
