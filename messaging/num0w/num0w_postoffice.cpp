@@ -376,7 +376,7 @@ bool PostOffice::WaitForActivity(double maxSecondsToWait)
         pollResult = zmq_poll(pollItems, 2, static_cast<long>(maxSecondsToWait * 1000));
         if (pollResult < 0) {
             std::ostringstream errorMessage;
-            errorMessage << "Error " << zmq::errno_to_string(errno) << " from zmq_poll.";
+            errorMessage << "Error " << errno << " (" << zmq::errno_to_string(errno) << ") from zmq_poll.";
             SetError(errorMessage.str());
         }
 
