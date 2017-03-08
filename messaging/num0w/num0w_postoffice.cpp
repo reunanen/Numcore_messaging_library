@@ -375,12 +375,20 @@ bool PostOffice::WaitForActivity(double maxSecondsToWait)
     do {
         pollResult = zmq_poll(pollItems, 2, static_cast<long>(maxSecondsToWait * 1000));
         if (pollResult < 0) {
-            std::ostringstream errorMessage;
-            errorMessage << "Error " << errno << " (" << zmq::errno_to_string(errno) << ") from zmq_poll.";
-            SetError(errorMessage.str());
+            if (errno == ENOTSOCK) {
+                // This is normal when Activity() is called.
+                hasIncomingSignalingMessage = true;
+            }
+            else {
+                std::ostringstream errorMessage;
+                errorMessage << "Error " << errno << " (" << zmq::errno_to_string(errno) << ") from zmq_poll.";
+                SetError(errorMessage.str());
+            }
         }
 
-        hasIncomingSignalingMessage = (pollResult > 0) && (pollItems[1].revents & ZMQ_POLLIN);
+        if (!hasIncomingSignalingMessage) {
+            hasIncomingSignalingMessage = (pollResult > 0) && (pollItems[1].revents & ZMQ_POLLIN);
+        }
 
         if (hasIncomingSignalingMessage) {
 #ifdef USE_NONBOUND_SIGNALING_SOCKET
