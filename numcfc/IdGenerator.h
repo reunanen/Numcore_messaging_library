@@ -10,12 +10,16 @@
 #define NUMCFC_ID_GENERATOR_H
 
 #include <string>
+#include <vector>
 
 namespace numcfc
 {
 
 std::string GetHostname();
+std::vector<std::string> GetIpAddresses(const std::string& hostname = GetHostname());
 std::string GetWorkingDirectory();
+
+std::string GenerateId(const std::string& hostname, const std::vector<std::string>& ipAddresses, const std::string& workingDirectory);
 
 class IdGenerator {
 public:

@@ -68,6 +68,26 @@ std::string GetHostname()
 	}
 }
 
+std::vector<std::string> GetIpAddresses(const std::string& hostname)
+{
+    std::vector<std::string> addresses;
+#ifdef WIN32
+    auto hostinfo = gethostbyname(hostname.c_str());
+    if (hostinfo != nullptr) {
+        int i = 0;
+        while (hostinfo->h_addr_list[i]) {
+            const char* ip = inet_ntoa(*(struct in_addr *) hostinfo->h_addr_list[i]);
+            addresses.push_back(ip);
+            ++i;
+        }
+    }
+#else
+    // TODO
+    addresses.push_back("Problem: GetIpAddresses not supported on non-Windows platforms yet");
+#endif
+    return addresses;
+}
+
 std::string GetWorkingDirectory()
 {
 	char buf[1024];
@@ -75,6 +95,25 @@ std::string GetWorkingDirectory()
 		strcpy_s(buf, "getcwd() returned NULL!");
 	}
 	return buf;
+}
+
+std::string GenerateId(const std::string& hostname, const std::vector<std::string>& ipAddresses, const std::string& workingDirectory)
+{
+    std::string id = "hostname:" + hostname;
+    id += ",ipAddresses:[";
+    bool firstIpAddress = true;
+    for (const auto& ipAddress : ipAddresses) {
+        if (firstIpAddress) {
+            firstIpAddress = false;
+        }
+        else {
+            id += ",";
+        }
+        id += ipAddress;
+    }
+    id += "]";
+    id += ",workingDirectory:" + workingDirectory;
+    return id;
 }
 
 }
