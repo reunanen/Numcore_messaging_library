@@ -72,7 +72,7 @@ std::vector<std::string> GetIpAddresses(const std::string& hostname)
 {
     std::vector<std::string> addresses;
 #ifdef WIN32
-    auto hostinfo = gethostbyname(hostname.c_str());
+    const auto hostinfo = gethostbyname(hostname.c_str());
     if (hostinfo != nullptr) {
         int i = 0;
         while (hostinfo->h_addr_list[i]) {
