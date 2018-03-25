@@ -7,3 +7,9 @@
 [submodule "samples/influx-writer/curl"]
 	path = samples/influx-writer/curl
 	url = https://github.com/curl/curl
+[submodule "messaging/numrabw/rabbitmq-c"]
+	path = messaging/numrabw/rabbitmq-c
+	url = https://github.com/alanxz/rabbitmq-c
+[submodule "messaging/numrabw/amqpcpp"]
+	path = messaging/numrabw/amqpcpp
+	url = https://github.com/reunanen/amqpcpp

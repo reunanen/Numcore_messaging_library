@@ -14,7 +14,7 @@
 #include "PostOffice.h"
 #include "AttributeMessage.h"
 #include "ThroughputStatistics.h"
-#include <messaging/num0w/num0w_postoffice.h>
+#include <messaging/numrabw/numrabw_postoffice.h>
 #include <numcfc/Time.h>
 #include <numcfc/ThreadRunner.h>
 #include <numcfc/IdGenerator.h>
@@ -557,8 +557,10 @@ std::shared_ptr<slaim::PostOffice> CreatePostOffice(PostOfficeInitializer& initi
 	std::string host = initializer.GetMessagingServerHost();
 	int port = initializer.GetMessagingServerPort();
 
+    // TODO: add username and password
+
 	std::ostringstream oss;
-	oss << "tcp://";
+	oss << "";
 	if (host.empty()) {
 		oss << "localhost";
 	}
@@ -568,7 +570,7 @@ std::shared_ptr<slaim::PostOffice> CreatePostOffice(PostOfficeInitializer& initi
 	oss << ":" << port;
 	std::string connectInfo = oss.str();
 
-	std::shared_ptr<slaim::ExtendedPostOffice> bpo(new num0w::PostOffice(connectInfo, clientIdentifier));
+	std::shared_ptr<slaim::ExtendedPostOffice> bpo(new numrabw::PostOffice(connectInfo, clientIdentifier));
 
 	//bpo->SetConnectInfo(connectInfo);
 	if (clientIdentifier) {

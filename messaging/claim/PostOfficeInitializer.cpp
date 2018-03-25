@@ -21,7 +21,7 @@ std::string DefaultPostOfficeInitializer::GetMessagingServerHost()
 
 int DefaultPostOfficeInitializer::GetMessagingServerPort()
 {
-	return 4808;
+	return 5672;
 }
 
 bool DefaultPostOfficeInitializer::IsBuffered()
@@ -68,7 +68,7 @@ std::string IniFilePostOfficeInitializer::GetMessagingServerHost()
 
 int IniFilePostOfficeInitializer::GetMessagingServerPort()
 {
-	int port = static_cast<int>(iniFile.GetSetValue("MessageBroker", "Port", 4808, "The port that the messaging server listens to (default is 4808)."));
+	int port = static_cast<int>(iniFile.GetSetValue("MessageBroker", "Port", 5672, "The port that the messaging server listens to (default is 4808)."));
 	return port;
 }
 

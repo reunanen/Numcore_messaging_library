@@ -13,8 +13,8 @@
     <Filter Include="messaging\claim">
       <UniqueIdentifier>{a598ac7c-5d38-463d-ae44-2c99329acef2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="messaging\num0w">
-      <UniqueIdentifier>{d8a944d0-928b-498c-9a7c-063a678215ec}</UniqueIdentifier>
+    <Filter Include="messaging\numrabw">
+      <UniqueIdentifier>{8b1ebc53-15c3-4c84-a7a5-d28f0f5abe32}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -48,8 +48,8 @@
     <ClCompile Include="numcfc\ThreadRunner.cpp">
       <Filter>numcfc</Filter>
     </ClCompile>
-    <ClCompile Include="messaging\num0w\num0w_postoffice.cpp">
-      <Filter>messaging\num0w</Filter>
+    <ClCompile Include="messaging\numrabw\numrabw_postoffice.cpp">
+      <Filter>messaging\numrabw</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -101,8 +101,8 @@
     <ClInclude Include="numcfc\ThreadRunner.h">
       <Filter>numcfc</Filter>
     </ClInclude>
-    <ClInclude Include="messaging\num0w\num0w_postoffice.h">
-      <Filter>messaging\num0w</Filter>
+    <ClInclude Include="messaging\numrabw\numrabw_postoffice.h">
+      <Filter>messaging\numrabw</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

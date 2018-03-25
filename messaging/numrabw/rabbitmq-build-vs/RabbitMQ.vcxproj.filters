@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="amqpcpp">
+      <UniqueIdentifier>{8682c18d-8e61-430f-a47b-3029929cc848}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rabbitmq-c">
+      <UniqueIdentifier>{22b18f31-d0fa-4d2f-a966-9179420029ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rabbitmq-c\win32">
+      <UniqueIdentifier>{20fe7234-93cd-4885-9c45-28f184ba6511}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\amqpcpp\src\AMQPBase.cpp">
+      <Filter>amqpcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\amqpcpp\src\AMQPException.cpp">
+      <Filter>amqpcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\amqpcpp\src\AMQPExchange.cpp">
+      <Filter>amqpcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\amqpcpp\src\AMQPMessage.cpp">
+      <Filter>amqpcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\amqpcpp\src\AMQPQueue.cpp">
+      <Filter>amqpcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\amqpcpp\src\AMQP.cpp">
+      <Filter>amqpcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rabbitmq-c\librabbitmq\amqp_api.c">
+      <Filter>rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rabbitmq-c\librabbitmq\amqp_connection.c">
+      <Filter>rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rabbitmq-c\librabbitmq\amqp_consumer.c">
+      <Filter>rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rabbitmq-c\librabbitmq\amqp_framing.c">
+      <Filter>rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rabbitmq-c\librabbitmq\amqp_hostcheck.c">
+      <Filter>rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rabbitmq-c\librabbitmq\amqp_mem.c">
+      <Filter>rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rabbitmq-c\librabbitmq\amqp_socket.c">
+      <Filter>rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rabbitmq-c\librabbitmq\amqp_table.c">
+      <Filter>rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rabbitmq-c\librabbitmq\amqp_tcp_socket.c">
+      <Filter>rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rabbitmq-c\librabbitmq\amqp_time.c">
+      <Filter>rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rabbitmq-c\librabbitmq\amqp_url.c">
+      <Filter>rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rabbitmq-c\librabbitmq\win32\threads.c">
+      <Filter>rabbitmq-c\win32</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
