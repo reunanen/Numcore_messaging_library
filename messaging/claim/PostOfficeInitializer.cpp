@@ -68,7 +68,7 @@ std::string IniFilePostOfficeInitializer::GetMessagingServerHost()
 
 int IniFilePostOfficeInitializer::GetMessagingServerPort()
 {
-	int port = static_cast<int>(iniFile.GetSetValue("MessageBroker", "Port", 5672, "The port that the messaging server listens to (default is 4808)."));
+	int port = static_cast<int>(iniFile.GetSetValue("MessageBroker", "Port", 5672, "The port that the RabbitMQ server listens to (default is 5672)."));
 	return port;
 }
 
