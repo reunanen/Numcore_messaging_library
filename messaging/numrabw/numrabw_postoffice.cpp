@@ -51,6 +51,8 @@ PostOffice::PostOffice(const std::string& connectString, const char* clientIdent
 	else {
 		m_clientIdentifier = "unknown";
 	}
+
+    CheckConnection();
 }
 
 PostOffice::~PostOffice()
