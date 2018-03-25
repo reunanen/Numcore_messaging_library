@@ -105,7 +105,7 @@
       <AdditionalDependencies />
     </Link>
     <Lib>
-      <AdditionalDependencies>RabbitMQ.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>RabbitMQ.lib;ws2_32.lib;advapi32.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -121,7 +121,7 @@
       </AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalDependencies>RabbitMQ.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>RabbitMQ.lib;ws2_32.lib;advapi32.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -135,7 +135,7 @@
       <AdditionalDependencies />
     </Link>
     <Lib>
-      <AdditionalDependencies>RabbitMQ.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>RabbitMQ.lib;ws2_32.lib;advapi32.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -150,7 +150,7 @@
       </AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalDependencies>RabbitMQ.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>RabbitMQ.lib;ws2_32.lib;advapi32.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
