@@ -33,8 +33,8 @@ public:
     {}
 
     std::unique_ptr<AMQP> amqp;
-    AMQPExchange* exchange;
-    AMQPQueue* queue;
+    AMQPExchange* exchange = nullptr;
+    AMQPQueue* queue = nullptr;
 
 #ifdef _DEBUG
     std::thread::id workerThreadId;
@@ -94,7 +94,9 @@ void PostOffice::Subscribe(const MessageType& type)
 
 	m_mySubscriptions.insert(type);
 
-    pimpl_->queue->Bind(exchangeName, type);
+    if (pimpl_->queue) {
+        pimpl_->queue->Bind(exchangeName, type);
+    }
 }
 
 void PostOffice::Unsubscribe(const MessageType& type)
@@ -103,7 +105,9 @@ void PostOffice::Unsubscribe(const MessageType& type)
 
 	m_mySubscriptions.erase(type);
 
-    pimpl_->queue->unBind(exchangeName, type);
+    if (pimpl_->queue) {
+        pimpl_->queue->unBind(exchangeName, type);
+    }
 }
 
 void sleep_minimal()
@@ -202,6 +206,8 @@ void PostOffice::CloseConnection()
     if (pimpl_->amqp) {
         pimpl_->amqp->closeChannel();
         pimpl_->amqp.reset();
+        pimpl_->exchange = nullptr;
+        pimpl_->queue = nullptr;
     }
 }
 
