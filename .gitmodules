@@ -1,9 +1,3 @@
-[submodule "messaging/num0w/libzmq"]
-	path = messaging/num0w/libzmq
-	url = https://github.com/reunanen/libzmq
-[submodule "messaging/num0w/cppzmq"]
-	path = messaging/num0w/cppzmq
-	url = https://github.com/zeromq/cppzmq
 [submodule "samples/influx-writer/curl"]
 	path = samples/influx-writer/curl
 	url = https://github.com/curl/curl
