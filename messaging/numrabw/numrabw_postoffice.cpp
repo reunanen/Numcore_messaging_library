@@ -11,10 +11,8 @@
 
 #include <memory>
 #include <sstream>
-
-#ifdef _DEBUG
 #include <thread>
-#endif
+#include <chrono>
 
 namespace {
     const char* exchangeName = "Numcore_messaging_library";
