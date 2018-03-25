@@ -3,7 +3,7 @@ The Numcore messaging library v2.0
 
 Copyright 2007-2008 Juha Reunanen
           2008-2012 Numcore Ltd
-          2014,2016 Juha Reunanen
+          2014,2016,2018 Juha Reunanen
 
 This library was used in Numcore Ltd's products to send and
 receive messages between different applications that may run
@@ -45,6 +45,9 @@ in order to promote its use in joint projects and elsewhere.
 
 
 Version history:
+
+v3.0 (2018-03-25):
+- Switch from ZeroMQ to RabbitMQ
 
 v2.0 (2016-07-25):
 - Switch from Spread toolkit to ZeroMQ and custom broker
