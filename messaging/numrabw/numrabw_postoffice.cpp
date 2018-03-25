@@ -1,5 +1,5 @@
 
-//           Copyright 2016 Juha Reunanen
+//           Copyright 2018 Juha Reunanen
 //
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
@@ -16,6 +16,12 @@
 
 namespace {
     const char* exchangeName = "Numcore_messaging_library";
+}
+
+// can't just include amqp_socket.h - there will be "error C2059: syntax error : 'delete'", at least on MSVC++
+extern "C" {
+#include "rabbitmq-c/librabbitmq/amqp_time.h"
+int amqp_poll(int fd, int event, amqp_time_t deadline);
 }
 
 namespace numrabw {
@@ -194,7 +200,28 @@ bool PostOffice::CheckConnection()
 // Returns true if there's a message to be received.
 bool PostOffice::WaitForActivity(double maxSecondsToWait)
 {
-    return true;
+    RegularOperations();
+
+    if (!IsMailboxOk()) {
+        return false;
+    }
+
+    const auto connectionState = pimpl_->amqp->getConnectionState();
+    if (amqp_frames_enqueued(connectionState)) {
+        return true;
+    }
+
+    amqp_time_t deadline;
+    struct timeval tv;
+    tv.tv_sec = static_cast<long>(floor(maxSecondsToWait));
+    tv.tv_usec = static_cast<long>((maxSecondsToWait - tv.tv_sec) * 1e6);
+    const int timeConversionResult = amqp_time_from_now(&deadline, &tv);
+
+    const int fd = amqp_get_sockfd(connectionState);
+    const int AMQP_SF_POLLIN = 2;
+    const int pollResult = amqp_poll(fd, AMQP_SF_POLLIN, deadline);
+
+    return pollResult == 0;
 }
 
 void PostOffice::Activity()
