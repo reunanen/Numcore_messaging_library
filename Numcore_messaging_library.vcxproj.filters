@@ -51,6 +51,9 @@
     <ClCompile Include="messaging\numrabw\numrabw_postoffice.cpp">
       <Filter>messaging\numrabw</Filter>
     </ClCompile>
+    <ClCompile Include="messaging\numrabw\crossguid\Guid.cpp">
+      <Filter>messaging\numrabw</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="numcfc\IdGenerator.h">

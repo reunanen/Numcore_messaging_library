@@ -458,8 +458,7 @@ private:
 				;
 			}
 			else {
-				// This needs to be improved
-				numcfc::SleepMinimal();
+				m_postOffice->WaitForActivity(1.0);
 			}
 		}
 	}

@@ -123,6 +123,9 @@
     </ClCompile>
     <ClCompile Include="..\rabbitmq-c\librabbitmq\win32\threads.c" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\amqpcpp\include\amqpcpp.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{79652778-EFB2-4F81-8B80-CE4F15ADBA6D}</ProjectGuid>
     <RootNamespace>RabbitMQ</RootNamespace>

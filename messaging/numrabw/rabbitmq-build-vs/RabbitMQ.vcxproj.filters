@@ -67,4 +67,9 @@
       <Filter>rabbitmq-c\win32</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\amqpcpp\include\amqpcpp.h">
+      <Filter>amqpcpp</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

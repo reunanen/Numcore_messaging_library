@@ -85,19 +85,8 @@ private:
     virtual void RegisterWorkerThread();
 #endif // DEBUG
 
-	std::set<slaim::MessageType> m_mySubscriptions;
-
-	std::list< std::pair<slaim::MessageType, bool> > m_myPendingSubscriptions;
-
 	std::string m_connectString;
 	std::string m_clientIdentifier;
-
-	char* m_pReceiveBuffer;
-	unsigned int m_nReceiveBufferSize;
-
-	std::map<std::string, slaim::Message> m_multiMessagesBeingReceived;
-
-	time_t m_tDummyMessageLastSent;
 
 	class Pimpl;
 	Pimpl* pimpl_;

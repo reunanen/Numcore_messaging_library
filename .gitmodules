@@ -7,3 +7,9 @@
 [submodule "messaging/numrabw/amqpcpp"]
 	path = messaging/numrabw/amqpcpp
 	url = https://github.com/reunanen/amqpcpp
+[submodule "messaging/numrabw/crossguid"]
+	path = messaging/numrabw/crossguid
+	url = https://github.com/reunanen/crossguid
+[submodule "messaging/numrabw/shared_buffer"]
+	path = messaging/numrabw/shared_buffer
+	url = https://github.com/reunanen/shared_buffer

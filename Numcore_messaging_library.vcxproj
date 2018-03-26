@@ -163,6 +163,12 @@
     <ClCompile Include="messaging\claim\MessageStreaming.cpp" />
     <ClCompile Include="messaging\claim\PostOffice.cpp" />
     <ClCompile Include="messaging\claim\PostOfficeInitializer.cpp" />
+    <ClCompile Include="messaging\numrabw\crossguid\Guid.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WIN32;GUID_WINDOWS;snprintf=_snprintf_s;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">WIN32;GUID_WINDOWS;snprintf=_snprintf_s;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WIN32;GUID_WINDOWS;snprintf=_snprintf_s;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;GUID_WINDOWS;snprintf=_snprintf_s;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="messaging\numrabw\numrabw_postoffice.cpp" />
     <ClCompile Include="messaging\slaim\messaging.cpp" />
     <ClCompile Include="numcfc\IdGenerator.cpp">

@@ -9,19 +9,19 @@
 
 #include "amqpcpp/include/AMQPcpp.h"
 
+#include "crossguid/Guid.hpp"
+
+#include "shared_buffer/shared_buffer.h"
+
 #include <memory>
 #include <sstream>
 #include <thread>
 #include <chrono>
+#include <atomic>
+#include <unordered_map>
 
 namespace {
     const char* exchangeName = "Numcore_messaging_library";
-}
-
-// can't just include amqp_socket.h - there will be "error C2059: syntax error : 'delete'", at least on MSVC++
-extern "C" {
-#include "rabbitmq-c/librabbitmq/amqp_time.h"
-int amqp_poll(int fd, int event, amqp_time_t deadline);
 }
 
 namespace numrabw {
@@ -36,20 +36,159 @@ public:
     ~Pimpl()
     {}
 
-    std::unique_ptr<AMQP> amqp;
-    AMQPExchange* exchange = nullptr;
-    AMQPQueue* queue = nullptr;
+    void RunReceiverThread(const std::string& connectString);
+    void RunSenderThread(const std::string& connectString);
+
+    void DeclareQueue(AMQPQueue* queue) const;
+
+    std::thread receiver;
+    std::thread sender;
+    std::atomic<bool> receiverOk = false;
+    std::atomic<bool> senderOk = false;
+    std::atomic<bool> killed = false;
 
 #ifdef _DEBUG
     std::thread::id workerThreadId;
 #endif
+
+    const std::string activityRoutingKey = "numrabw_activity_" + std::string(xg::newGuid());
+
+    struct SubscribeAction {
+        bool subscribe;
+        std::string messageType;
+    };
+
+    shared_buffer<SubscribeAction> pendingSubscribeActions;
+
+    shared_buffer<slaim::Message> receivedMessages;
+    shared_buffer<slaim::Message> messagesToBeSent;
+
+    shared_buffer<std::string> errors;
+
+    struct ActivityTrigger {
+        std::unique_ptr<AMQP> amqp;
+        AMQPExchange* exchange = nullptr;
+    };
+
+    std::mutex activityTriggersMutex;
+    std::unordered_map<std::thread::id, ActivityTrigger> activityTriggers;
+
+    shared_buffer<size_t> activityTriggersFromReceiverThread;
 };
+
+void DeclareExchange(AMQPExchange* exchange)
+{
+    exchange->Declare(exchangeName, "topic", AMQP_DURABLE);
+}
+
+void PostOffice::Pimpl::DeclareQueue(AMQPQueue* queue) const
+{
+    queue->Declare("", AMQP_EXCLUSIVE);
+    queue->Bind(exchangeName, activityRoutingKey);
+}
+
+void PostOffice::Pimpl::RunReceiverThread(const std::string& connectString)
+{
+    std::set<slaim::MessageType> mySubscriptions;
+
+    while (!killed) {
+        try {
+            AMQP amqp(connectString);
+            AMQPExchange* exchange = amqp.createExchange();
+            DeclareExchange(exchange);
+            AMQPQueue* queue = amqp.createQueue();
+            DeclareQueue(queue);
+
+            for (const auto& messageType : mySubscriptions) {
+                queue->Bind(exchangeName, messageType);
+            }
+
+            std::function<int(AMQPMessage*)> onMessage = [this](AMQPMessage* m) {
+                slaim::Message msg;
+                msg.m_type = m->getRoutingKey();
+
+                if (msg.m_type == activityRoutingKey) {
+                    return 1; // triggered activity
+                }
+
+                uint32_t messageLength = 0;
+                const char *data = m->getMessage(&messageLength);
+                if (messageLength > 0) {
+                    msg.m_text = std::string(data, data + messageLength);
+                    if (messageLength != msg.m_text.length()) {
+                        std::ostringstream error;
+                        error << "Message size mismatch: " << messageLength << " != " << msg.m_text.length();
+                        errors.push_back(error.str());
+                        return 2;
+                    }
+                }
+
+                receivedMessages.push_back(msg);
+                return 0;
+            };
+
+            queue->addEvent(AMQP_MESSAGE, onMessage);
+
+            size_t trigger = 0;
+
+            receiverOk = true;
+
+            while (!killed) {
+                SubscribeAction subscribeAction;
+                while (pendingSubscribeActions.pop_front(subscribeAction)) {
+                    if (subscribeAction.subscribe) {
+                        mySubscriptions.insert(subscribeAction.messageType);
+                        queue->Bind(exchangeName, subscribeAction.messageType);
+                    }
+                    else {
+                        mySubscriptions.erase(subscribeAction.messageType);
+                        queue->unBind(exchangeName, subscribeAction.messageType);
+                    }
+                }
+
+                queue->Consume();
+                activityTriggersFromReceiverThread.push_back(trigger++);
+            }
+        }
+        catch (std::exception& e) {
+            receiverOk = false;
+            errors.push_back(e.what());
+        }
+    }
+}
+
+void PostOffice::Pimpl::RunSenderThread(const std::string& connectString)
+{
+    while (!killed) {
+        try {
+            AMQP amqp(connectString);
+            AMQPExchange* exchange = amqp.createExchange();
+            DeclareExchange(exchange);
+
+            senderOk = true;
+
+            while (!killed) {
+                slaim::Message msg;
+                if (messagesToBeSent.pop_front(msg)) {
+                    exchange->Publish(msg.m_text, msg.m_type);
+                }
+            }
+        }
+        catch (std::exception& e) {
+            errors.push_back(e.what());
+            senderOk = false;
+        }
+    }
+}
+
 
 PostOffice::PostOffice(const std::string& connectString, const char* clientIdentifier)
 {
 	m_connectString = connectString;
 
 	pimpl_ = new Pimpl;
+    pimpl_->receiver = std::thread(&Pimpl::RunReceiverThread, pimpl_, connectString);
+    pimpl_->sender = std::thread(&Pimpl::RunSenderThread, pimpl_, connectString);
 
 	if (clientIdentifier) {
 		m_clientIdentifier = clientIdentifier;
@@ -57,13 +196,15 @@ PostOffice::PostOffice(const std::string& connectString, const char* clientIdent
 	else {
 		m_clientIdentifier = "unknown";
 	}
-
-    CheckConnection();
 }
 
 PostOffice::~PostOffice()
 {
-    CloseConnection();
+    pimpl_->killed = true;
+    Activity();
+    pimpl_->messagesToBeSent.halt();
+    pimpl_->receiver.join();
+    pimpl_->sender.join();
     delete pimpl_;
 }
 
@@ -86,155 +227,96 @@ std::string PostOffice::GetClientAddress() const
 
 bool PostOffice::IsMailboxOk() const
 {
-    return pimpl_->amqp.get() != nullptr;
+    return pimpl_->receiverOk && pimpl_->senderOk;
 }
 
 void PostOffice::RegularOperations()
 {
-	CheckConnection();
+    if (!HasError()) {
+        std::string error;
+        if (pimpl_->errors.pop_front(error)) {
+            SetError(error);
+        }
+    }
 }
 
 void PostOffice::Subscribe(const MessageType& type)
 {
-	RegularOperations();
-
-	m_mySubscriptions.insert(type);
-
-    if (pimpl_->queue) {
-        pimpl_->queue->Bind(exchangeName, type);
-    }
+    Pimpl::SubscribeAction subscribeAction;
+    subscribeAction.messageType = type;
+    subscribeAction.subscribe = true;
+    pimpl_->pendingSubscribeActions.push_back(subscribeAction);
+    Activity();
 }
 
 void PostOffice::Unsubscribe(const MessageType& type)
 {
-	RegularOperations();
-
-	m_mySubscriptions.erase(type);
-
-    if (pimpl_->queue) {
-        pimpl_->queue->unBind(exchangeName, type);
-    }
-}
-
-void sleep_minimal()
-{
-#ifdef _WIN32
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-#else // _WIN32
-    usleep(10000);
-#endif // _WIN32
+    Pimpl::SubscribeAction subscribeAction;
+    subscribeAction.messageType = type;
+    subscribeAction.subscribe = false;
+    pimpl_->pendingSubscribeActions.push_back(subscribeAction);
+    Activity();
 }
 
 bool PostOffice::Receive(Message& msg, double maxSecondsToWait)
 {
-	RegularOperations();
-
-	if (!IsMailboxOk()) {
-		return false;
-	}
-
-    const short receiveFlags = 0; // auto-ack
-
-    pimpl_->queue->Get(receiveFlags);
-
-    AMQPMessage* m = pimpl_->queue->getMessage();
-
-    const auto count = m->getMessageCount();
-    if (count == -1) {
-        sleep_minimal();
-        return false;
-    }
-
-    msg.m_type = m->getRoutingKey();
-
-    uint32_t messageLength = 0;
-    const char *data = m->getMessage(&messageLength);
-    if (messageLength > 0) {
-        msg.m_text = std::string(data, data + messageLength);
-        if (messageLength != msg.m_text.length()) {
-            std::ostringstream error;
-            error << "Message size mismatch: " << messageLength << " != " << msg.m_text.length();
-            throw std::runtime_error(error.str());
-        }
-    }
-    return true;
+    std::chrono::microseconds maxDuration(static_cast<long long>(std::round(maxSecondsToWait * 1e-6)));
+    return pimpl_->receivedMessages.pop_front(msg, maxDuration);
 }
 
 bool PostOffice::Send(const Message& msg)
 {
+    assert(pimpl_->workerThreadId == std::this_thread::get_id());
+
 	RegularOperations();
 
-	if (!IsMailboxOk()) {
-		SetError("Unable to send because the connection is not ok.");
-		return false;
-	}
-
-    pimpl_->exchange->Publish(msg.m_text, msg.m_type);
-
-    return true;
-}
-
-bool PostOffice::CheckConnection()
-{
-    if (!pimpl_->amqp) {
-        try {
-            pimpl_->amqp = std::make_unique<AMQP>(m_connectString);
-            pimpl_->exchange = pimpl_->amqp->createExchange();
-            pimpl_->exchange->Declare(exchangeName, "topic", AMQP_DURABLE);
-            pimpl_->queue = pimpl_->amqp->createQueue();
-            pimpl_->queue->Declare("", AMQP_EXCLUSIVE);
-
-            for (const auto& subscription : m_mySubscriptions) {
-                pimpl_->queue->Bind(exchangeName, subscription);
-            }
-        }
-        catch (std::exception& e) {
-            SetError(e.what());
-            CloseConnection();
-        }
+    if (pimpl_->messagesToBeSent.size() < 100000) {
+        pimpl_->messagesToBeSent.push_back(msg);
+        return true;
     }
-
-	return IsMailboxOk();
+    else {
+        SetError("Unable to send, because the buffer is full");
+        return false;
+    }
 }
 
 // Returns true if there's a message to be received.
 bool PostOffice::WaitForActivity(double maxSecondsToWait)
 {
-    RegularOperations();
+    assert(pimpl_->workerThreadId == std::this_thread::get_id());
 
-    if (!IsMailboxOk()) {
-        return false;
+    bool received = false;
+    size_t dummy;
+    std::chrono::microseconds maxDuration(static_cast<long long>(std::round(maxSecondsToWait * 1e-6)));
+    if (pimpl_->activityTriggersFromReceiverThread.pop_front(dummy, maxDuration)) {
+        received = true;
     }
-
-    const auto connectionState = pimpl_->amqp->getConnectionState();
-    if (amqp_frames_enqueued(connectionState)) {
-        return true;
+    if (received) {
+        while (pimpl_->activityTriggersFromReceiverThread.pop_front(dummy)) {
+            ;
+        }
     }
-
-    amqp_time_t deadline;
-    struct timeval tv;
-    tv.tv_sec = static_cast<long>(floor(maxSecondsToWait));
-    tv.tv_usec = static_cast<long>((maxSecondsToWait - tv.tv_sec) * 1e6);
-    const int timeConversionResult = amqp_time_from_now(&deadline, &tv);
-
-    const int fd = amqp_get_sockfd(connectionState);
-    const int AMQP_SF_POLLIN = 2;
-    const int pollResult = amqp_poll(fd, AMQP_SF_POLLIN, deadline);
-
-    return pollResult == 0;
+    return received;
 }
 
 void PostOffice::Activity()
 {
-}
-
-void PostOffice::CloseConnection()
-{
-    if (pimpl_->amqp) {
-        pimpl_->amqp->closeChannel();
-        pimpl_->amqp.reset();
-        pimpl_->exchange = nullptr;
-        pimpl_->queue = nullptr;
+    const auto threadId = std::this_thread::get_id();
+    std::lock_guard<std::mutex> lock(pimpl_->activityTriggersMutex);
+    auto i = pimpl_->activityTriggers.find(threadId);
+    try {
+        if (i == pimpl_->activityTriggers.end()) {
+            Pimpl::ActivityTrigger& activityTrigger = pimpl_->activityTriggers[threadId];
+            activityTrigger.amqp = std::make_unique<AMQP>(m_connectString);
+            activityTrigger.exchange = activityTrigger.amqp->createExchange();
+            DeclareExchange(activityTrigger.exchange);
+            i = pimpl_->activityTriggers.find(threadId);
+        }
+        i->second.exchange->Publish("", pimpl_->activityRoutingKey);
+    }
+    catch (std::exception& e) {
+        pimpl_->activityTriggers.erase(threadId);
+        pimpl_->errors.push_back(e.what());
     }
 }
 
