@@ -108,7 +108,6 @@ void PostOffice::Pimpl::RunReceiverThread(const std::string& connectString)
                 msg.m_type = m->getRoutingKey();
 
                 if (msg.m_type == activityRoutingKey) {
-                    queue->Ack(m->getDeliveryTag());
                     return 1; // triggered activity
                 }
 
@@ -120,13 +119,11 @@ void PostOffice::Pimpl::RunReceiverThread(const std::string& connectString)
                         std::ostringstream error;
                         error << "Message size mismatch: " << messageLength << " != " << msg.m_text.length();
                         errors.push_back(error.str());
-                        queue->Reject(m->getDeliveryTag(), false);
                         return 2;
                     }
                 }
 
                 receivedMessages.push_back(msg);
-                queue->Ack(m->getDeliveryTag());
                 return 0;
             };
 
@@ -149,7 +146,7 @@ void PostOffice::Pimpl::RunReceiverThread(const std::string& connectString)
                     }
                 }
 
-                queue->Consume();
+                queue->Consume(AMQP_NOACK);
                 activityTriggersFromReceiverThread.push_back(trigger++);
             }
         }
