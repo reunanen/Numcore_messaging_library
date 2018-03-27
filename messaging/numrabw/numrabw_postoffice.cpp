@@ -148,7 +148,7 @@ void PostOffice::Pimpl::RunReceiverThread(const std::string& connectString)
                     }
                 }
 
-                queue->Consume();
+                queue->Consume(AMQP_NOACK);
             }
         }
         catch (std::exception& e) {
