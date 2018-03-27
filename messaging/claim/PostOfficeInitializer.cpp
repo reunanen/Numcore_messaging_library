@@ -57,13 +57,13 @@ std::string IniFilePostOfficeInitializer::GetMessagingServerHost()
 	const char* defaultHost = "";
 #endif // WIN32
 
-	std::string host = iniFile.GetSetValue("MessageBroker", "Host", defaultHost, "IP address or network hostname of the messaging server.");
+	std::string host = iniFile.GetSetValue("MessagingServer", "Host", defaultHost, "IP address or network hostname of the messaging server.");
 	return host;
 }
 
 int IniFilePostOfficeInitializer::GetMessagingServerPort()
 {
-	int port = static_cast<int>(iniFile.GetSetValue("MessageBroker", "Port", 5672, "The port that the RabbitMQ server listens to (default is 5672)."));
+	int port = static_cast<int>(iniFile.GetSetValue("MessagingServer", "Port", 5672, "The port that the RabbitMQ server listens to (default is 5672)."));
 	return port;
 }
 
