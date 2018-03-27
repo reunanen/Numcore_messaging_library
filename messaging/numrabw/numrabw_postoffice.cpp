@@ -215,10 +215,11 @@ void PostOffice::Pimpl::RunSenderThread(const std::string& connectString)
             senderOk = true;
 
             auto nextStatusMessageTime = std::chrono::steady_clock::now();
+            double maxSecondsToWait = 0.0;
 
             while (!killed) {
                 slaim::Message msg;
-                if (sendBuffer.pop_front(msg, 1.0)) {
+                if (sendBuffer.pop_front(msg, maxSecondsToWait)) {
                     exchange->Publish(msg.m_text, msg.m_type);
                     sendThroughput.AddThroughput(msg.GetSize());
                 }
@@ -227,7 +228,8 @@ void PostOffice::Pimpl::RunSenderThread(const std::string& connectString)
                 if (now >= nextStatusMessageTime) {
                     slaim::Message statusMessage = GetStatusMessage();
                     exchange->Publish(statusMessage.m_text, statusMessage.m_type);
-                    nextStatusMessageTime = now;
+                    nextStatusMessageTime += std::chrono::seconds(1);
+                    maxSecondsToWait = (std::max)(0.0, std::chrono::duration_cast<std::chrono::microseconds>(nextStatusMessageTime - now).count() * 1e-6);
                 }
             }
         }
