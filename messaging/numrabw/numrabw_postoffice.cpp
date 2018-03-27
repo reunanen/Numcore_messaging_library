@@ -178,7 +178,7 @@ int PostOffice::Pimpl::HandleReceivedMessage(AMQPMessage* m)
         return 1; // triggered activity
     }
 
-    uint32_t messageLength = 0;
+    size_t messageLength = 0;
     const char *data = m->getMessage(&messageLength);
     if (messageLength > 0) {
         msg.m_text = std::string(data, data + messageLength);
