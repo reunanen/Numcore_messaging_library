@@ -16,6 +16,15 @@
     <Filter Include="messaging\numrabw">
       <UniqueIdentifier>{8b1ebc53-15c3-4c84-a7a5-d28f0f5abe32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="messaging\numrabw\amqpcpp">
+      <UniqueIdentifier>{8d7b9dc6-af25-40f4-8bef-2438ea0619fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="messaging\numrabw\rabbitmq-c">
+      <UniqueIdentifier>{e4b57b99-0685-4001-bd52-8b1ed799d973}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="messaging\numrabw\rabbitmq-c\win32">
+      <UniqueIdentifier>{6f069743-f03c-4211-a05b-6b5311cdace8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="numcfc\IdGenerator.cpp">
@@ -53,6 +62,60 @@
     </ClCompile>
     <ClCompile Include="messaging\numrabw\crossguid\Guid.cpp">
       <Filter>messaging\numrabw</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\amqpcpp\src\AMQP.cpp">
+      <Filter>messaging\numrabw\amqpcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\amqpcpp\src\AMQPBase.cpp">
+      <Filter>messaging\numrabw\amqpcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\amqpcpp\src\AMQPException.cpp">
+      <Filter>messaging\numrabw\amqpcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\amqpcpp\src\AMQPExchange.cpp">
+      <Filter>messaging\numrabw\amqpcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\amqpcpp\src\AMQPMessage.cpp">
+      <Filter>messaging\numrabw\amqpcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\amqpcpp\src\AMQPQueue.cpp">
+      <Filter>messaging\numrabw\amqpcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_api.c">
+      <Filter>messaging\numrabw\rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_connection.c">
+      <Filter>messaging\numrabw\rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_consumer.c">
+      <Filter>messaging\numrabw\rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_framing.c">
+      <Filter>messaging\numrabw\rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_hostcheck.c">
+      <Filter>messaging\numrabw\rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_mem.c">
+      <Filter>messaging\numrabw\rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_socket.c">
+      <Filter>messaging\numrabw\rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_table.c">
+      <Filter>messaging\numrabw\rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_tcp_socket.c">
+      <Filter>messaging\numrabw\rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_time.c">
+      <Filter>messaging\numrabw\rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_url.c">
+      <Filter>messaging\numrabw\rabbitmq-c</Filter>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\win32\threads.c">
+      <Filter>messaging\numrabw\rabbitmq-c\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -109,6 +172,9 @@
     </ClInclude>
     <ClInclude Include="messaging\numrabw\LimitedSizeBuffer.h">
       <Filter>messaging\numrabw</Filter>
+    </ClInclude>
+    <ClInclude Include="messaging\numrabw\amqpcpp\include\amqpcpp.h">
+      <Filter>messaging\numrabw\amqpcpp</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
