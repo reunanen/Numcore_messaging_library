@@ -188,6 +188,7 @@
     <ClInclude Include="messaging\claim\PostOffice.h" />
     <ClInclude Include="messaging\claim\PostOfficeInitializer.h" />
     <ClInclude Include="messaging\claim\ThroughputStatistics.h" />
+    <ClInclude Include="messaging\numrabw\LimitedSizeBuffer.h" />
     <ClInclude Include="messaging\numrabw\numrabw_postoffice.h" />
     <ClInclude Include="messaging\slaim\buffer.h" />
     <ClInclude Include="messaging\slaim\bufferitem.h" />

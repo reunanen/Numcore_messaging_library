@@ -19,7 +19,6 @@ public:
 	virtual std::string GetMessagingServerHost() = 0;
 	virtual int GetMessagingServerPort() = 0;
 
-	virtual bool IsBuffered() = 0;
 	virtual size_t GetReceiveBufferMaxItemCount() = 0;
 	virtual double GetReceiveBufferMaxMegabytes() = 0;
 	virtual size_t GetSendBufferMaxItemCount() = 0;
@@ -32,7 +31,6 @@ public:
 	virtual std::string GetMessagingServerHost();
 	virtual int GetMessagingServerPort();
 
-	virtual bool IsBuffered();
 	virtual size_t GetReceiveBufferMaxItemCount();
 	virtual double GetReceiveBufferMaxMegabytes();
 	virtual size_t GetSendBufferMaxItemCount();
@@ -47,7 +45,6 @@ public:
 	virtual std::string GetMessagingServerHost();
 	virtual int GetMessagingServerPort();
 
-	virtual bool IsBuffered();
 	virtual size_t GetReceiveBufferMaxItemCount();
 	virtual double GetReceiveBufferMaxMegabytes();
 	virtual size_t GetSendBufferMaxItemCount();

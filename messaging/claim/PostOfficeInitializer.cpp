@@ -24,11 +24,6 @@ int DefaultPostOfficeInitializer::GetMessagingServerPort()
 	return 5672;
 }
 
-bool DefaultPostOfficeInitializer::IsBuffered()
-{
-	return true;
-}
-
 size_t DefaultPostOfficeInitializer::GetReceiveBufferMaxItemCount()
 {
 	return 262144;
@@ -70,12 +65,6 @@ int IniFilePostOfficeInitializer::GetMessagingServerPort()
 {
 	int port = static_cast<int>(iniFile.GetSetValue("MessageBroker", "Port", 5672, "The port that the RabbitMQ server listens to (default is 5672)."));
 	return port;
-}
-
-bool IniFilePostOfficeInitializer::IsBuffered()
-{
-	int bufferedPostOffice = static_cast<int>(iniFile.GetSetValue("PostOffice", "Buffered", 1, "Use buffered post office? (0/1)"));
-	return bufferedPostOffice != 0;
 }
 
 size_t IniFilePostOfficeInitializer::GetReceiveBufferMaxItemCount()

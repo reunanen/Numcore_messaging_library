@@ -44,7 +44,6 @@ public:
 	virtual bool Send(const slaim::Message& msg);
 	virtual bool Receive(slaim::Message& msg, double maxSecondsToWait = 0);
 
-	virtual void SetClientIdentifier(const std::string& clientIdentifier); // deprecated
 	virtual std::string GetClientAddress() const;
 	virtual const char* GetVersion() const;
 	virtual std::string GetError();

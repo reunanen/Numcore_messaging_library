@@ -107,5 +107,8 @@
     <ClInclude Include="messaging\numrabw\numrabw_postoffice.h">
       <Filter>messaging\numrabw</Filter>
     </ClInclude>
+    <ClInclude Include="messaging\numrabw\LimitedSizeBuffer.h">
+      <Filter>messaging\numrabw</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
