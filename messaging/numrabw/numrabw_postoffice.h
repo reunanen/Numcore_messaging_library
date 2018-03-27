@@ -37,14 +37,6 @@ public:
 
     virtual const char* GetVersion() const override;
 
-#if 0
-	//* NB: May be called from the registered worker thread only.
-	virtual bool WaitForActivity(double maxSecondsToWait);
-#endif
-
-	//* May be called from any thread.
-	virtual void Activity();
-
     virtual std::string GetError() override;
 
     virtual std::string GetClientAddress() const override;
@@ -52,7 +44,10 @@ public:
     void ReadSettings(claim::PostOfficeInitializer& initializer);
 
 private:
-	const std::string connectString;
+    // May be called from any thread.
+    virtual void Activity();
+
+    const std::string connectString;
 
 	class Pimpl;
 	Pimpl* pimpl_;

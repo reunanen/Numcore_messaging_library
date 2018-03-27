@@ -19,8 +19,15 @@ class LimitedSizeBuffer {
 public:
     LimitedSizeBuffer() : m_maxItemCount(1024), m_maxByteCount(1024 * 1024), m_currentByteCount(0) {}
 
-    void SetMaxItemCount(size_t maxItemCount) { m_maxItemCount = maxItemCount; }
-    void SetMaxByteCount(size_t maxByteCount) { m_maxByteCount = maxByteCount; }
+    void SetMaxItemCount(size_t maxItemCount) {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        m_maxItemCount = maxItemCount;
+    }
+
+    void SetMaxByteCount(size_t maxByteCount) {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        m_maxByteCount = maxByteCount;
+    }
 
     bool push_back(const T& item) {
         std::unique_lock<std::mutex> lock(m_mutex);
@@ -84,6 +91,7 @@ public:
         assert((m_currentByteCount == 0) == m_items.empty());
         return true;
     }
+
     std::pair<size_t, size_t> GetItemAndByteCount() const {
         std::unique_lock<std::mutex> lock(m_mutex);
         std::pair<size_t, size_t> p(std::make_pair(m_items.size(), m_currentByteCount));

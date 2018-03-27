@@ -16,6 +16,10 @@
 #include "errorlog.h"
 #include "message.h"
 
+#ifdef WIN32
+#pragma comment(lib, "Ws2_32.lib")
+#endif
+
 namespace slaim {
 
 //! A generic post office interface.

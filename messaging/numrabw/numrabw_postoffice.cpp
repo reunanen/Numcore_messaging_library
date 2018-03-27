@@ -98,18 +98,6 @@ public:
     numcfc::TimeElapsed teSinceHostnameLastChecked;
 
     std::string username;
-
-#if 0
-    struct ActivityTrigger {
-        std::unique_ptr<AMQP> amqp;
-        AMQPExchange* exchange = nullptr;
-    };
-
-    std::mutex activityTriggersMutex;
-    std::unordered_map<std::thread::id, ActivityTrigger> activityTriggers;
-
-    shared_buffer<size_t> activityTriggersFromReceiverThread;
-#endif
 };
 
 void DeclareExchange(AMQPExchange* exchange)
@@ -145,8 +133,6 @@ void PostOffice::Pimpl::RunReceiverThread(const std::string& connectString)
 
             queue->addEvent(AMQP_MESSAGE, onMessage);
 
-            size_t trigger = 0;
-
             receiverOk = true;
 
             while (!killed) {
@@ -163,9 +149,6 @@ void PostOffice::Pimpl::RunReceiverThread(const std::string& connectString)
                 }
 
                 queue->Consume();
-#if 0
-                activityTriggersFromReceiverThread.push_back(trigger++);
-#endif
             }
         }
         catch (std::exception& e) {
@@ -412,27 +395,6 @@ bool PostOffice::Send(const Message& msg)
     }
     return retVal;
 }
-
-#if 0
-// Returns true if there's a message to be received.
-bool PostOffice::WaitForActivity(double maxSecondsToWait)
-{
-    assert(pimpl_->workerThreadId == std::this_thread::get_id());
-
-    bool received = false;
-    size_t dummy;
-    std::chrono::microseconds maxDuration(static_cast<long long>(std::round(maxSecondsToWait * 1e-6)));
-    if (pimpl_->activityTriggersFromReceiverThread.pop_front(dummy, maxDuration)) {
-        received = true;
-    }
-    if (received) {
-        while (pimpl_->activityTriggersFromReceiverThread.pop_front(dummy)) {
-            ;
-        }
-    }
-    return received;
-}
-#endif
 
 void PostOffice::Activity()
 {
