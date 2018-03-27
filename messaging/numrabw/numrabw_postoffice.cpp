@@ -114,6 +114,7 @@ void PostOffice::Pimpl::DeclareQueue(AMQPQueue* queue) const
 void PostOffice::Pimpl::RunReceiverThread(const std::string& connectString)
 {
     std::set<slaim::MessageType> mySubscriptions;
+    bool error = false;
 
     while (!killed) {
         try {
@@ -134,6 +135,11 @@ void PostOffice::Pimpl::RunReceiverThread(const std::string& connectString)
             queue->addEvent(AMQP_MESSAGE, onMessage);
 
             receiverOk = true;
+            if (error) {
+                error = false;
+                std::lock_guard<std::mutex> lock(errorLogMutex);
+                errorLog.SetError("Receiver now ok");
+            }
 
             while (!killed) {
                 SubscribeAction subscribeAction;
@@ -153,8 +159,12 @@ void PostOffice::Pimpl::RunReceiverThread(const std::string& connectString)
         }
         catch (std::exception& e) {
             receiverOk = false;
-            std::lock_guard<std::mutex> lock(errorLogMutex);
-            errorLog.SetError(e.what());
+            if (!error) {
+                error = true;
+                std::lock_guard<std::mutex> lock(errorLogMutex);
+                errorLog.SetError("Receiver: " + std::string(e.what()));
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
     }
 }
@@ -206,6 +216,8 @@ int PostOffice::Pimpl::HandleReceivedMessage(AMQPMessage* m)
 
 void PostOffice::Pimpl::RunSenderThread(const std::string& connectString)
 {
+    bool error = false;
+
     while (!killed) {
         try {
             AMQP amqp(connectString);
@@ -213,6 +225,11 @@ void PostOffice::Pimpl::RunSenderThread(const std::string& connectString)
             DeclareExchange(exchange);
 
             senderOk = true;
+            if (error) {
+                error = false;
+                std::lock_guard<std::mutex> lock(errorLogMutex);
+                errorLog.SetError("Sender now ok");
+            }
 
             auto nextStatusMessageTime = std::chrono::steady_clock::now();
             double maxSecondsToWait = 0.0;
@@ -234,9 +251,13 @@ void PostOffice::Pimpl::RunSenderThread(const std::string& connectString)
             }
         }
         catch (std::exception& e) {
-            std::lock_guard<std::mutex> lock(errorLogMutex);
-            errorLog.SetError(e.what());
             senderOk = false;
+            if (!error) {
+                error = true;
+                std::lock_guard<std::mutex> lock(errorLogMutex);
+                errorLog.SetError("Sender: " + std::string(e.what()));
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
     }
 }
