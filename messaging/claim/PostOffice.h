@@ -53,7 +53,6 @@ private:
     PostOffice(const PostOffice&);
     PostOffice& operator= (const PostOffice&);
 
-	void CopyError();
 	void CheckInitialized() const; // throws if not
 
 	class Impl;

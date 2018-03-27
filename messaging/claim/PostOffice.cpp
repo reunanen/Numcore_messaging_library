@@ -108,7 +108,6 @@ bool PostOffice::Send(const slaim::Message& msg)
 bool PostOffice::Receive(slaim::Message& msg, double maxSecondsToWait)
 {
 	CheckInitialized();
-	CopyError();
 	return pimpl_->postOffice->Receive(msg, maxSecondsToWait); 
 }
 
@@ -126,18 +125,8 @@ const char* PostOffice::GetVersion() const
 
 std::string PostOffice::GetError()
 {
-	CheckInitialized();
-	CopyError();
-	return slaim::PostOffice::GetError();
-}
-
-void PostOffice::CopyError()
-{
-	CheckInitialized();
-	std::string error = pimpl_->postOffice->GetError();
-	if (!error.empty()) {
-		SetError(error);
-	}
+    CheckInitialized();
+    return pimpl_->postOffice->GetError();
 }
 
 }
