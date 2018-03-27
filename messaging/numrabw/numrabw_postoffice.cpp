@@ -224,7 +224,7 @@ void PostOffice::Pimpl::RunSenderThread(const std::string& connectString)
                 }
 
                 const auto now = std::chrono::steady_clock::now();
-                if (nextStatusMessageTime >= now) {
+                if (now >= nextStatusMessageTime) {
                     slaim::Message statusMessage = GetStatusMessage();
                     exchange->Publish(statusMessage.m_text, statusMessage.m_type);
                     nextStatusMessageTime = now;
