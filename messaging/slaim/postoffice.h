@@ -18,6 +18,8 @@
 
 #ifdef WIN32
 #pragma comment(lib, "Ws2_32.lib")
+#pragma comment(lib, "Ole32.lib")
+#pragma comment(lib, "Advapi32.lib")
 #endif
 
 namespace slaim {
