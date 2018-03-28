@@ -1,4 +1,4 @@
-The Numcore messaging library v2.0
+The Numcore messaging library v3.0
 ==================================
 
 Copyright 2007-2008 Juha Reunanen
