@@ -26,6 +26,7 @@
 #include <chrono>
 #include <atomic>
 #include <unordered_map>
+#include <future>
 
 #ifdef WIN32
 //#ifdef _DEBUG
@@ -71,10 +72,6 @@ public:
     std::atomic<bool> senderOk = false;
     std::atomic<bool> killed = false;
 
-#ifdef _DEBUG
-    std::thread::id workerThreadId;
-#endif
-
     const std::string activityRoutingKey = "numrabw_activity_" + std::string(xg::newGuid());
     const numcfc::Time timeStarted;
 
@@ -98,6 +95,9 @@ public:
     numcfc::TimeElapsed teSinceHostnameLastChecked;
 
     std::string username;
+
+    std::mutex activityFuturesMutex;
+    std::deque<std::future<void>> activityFutures;
 };
 
 void DeclareExchange(AMQPExchange* exchange)
@@ -362,6 +362,14 @@ PostOffice::~PostOffice()
 {
     pimpl_->killed = true;
     Activity();
+
+    {
+        std::lock_guard<std::mutex> lock(pimpl_->activityFuturesMutex);
+        while (!pimpl_->activityFutures.empty()) {
+            pimpl_->activityFutures.pop_front();
+        }
+    }
+
     pimpl_->receiver.join();
     pimpl_->sender.join();
     delete pimpl_;
@@ -421,16 +429,34 @@ bool PostOffice::Send(const Message& msg)
 
 void PostOffice::Activity()
 {
-    try {
-        AMQP amqp(connectString);
-        AMQPExchange* exchange = amqp.createExchange();
-        DeclareExchange(exchange);
-        exchange->Publish("", pimpl_->activityRoutingKey);
+    {
+        std::lock_guard<std::mutex> lock(pimpl_->activityFuturesMutex);
+        for (auto i = pimpl_->activityFutures.begin(), end = pimpl_->activityFutures.end(); i != end; ) {
+            if (i->wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                i = pimpl_->activityFutures.erase(i);
+                end = pimpl_->activityFutures.end();
+            }
+            else {
+                ++i;
+            }
+        }
     }
-    catch (std::exception& e) {
-        std::lock_guard<std::mutex> lock(pimpl_->errorLogMutex);
-        pimpl_->errorLog.SetError(e.what());
-    }
+
+    auto handle = std::async(std::launch::async, [this]() {
+        try {
+            AMQP amqp(connectString);
+            AMQPExchange* exchange = amqp.createExchange();
+            DeclareExchange(exchange);
+            exchange->Publish("", pimpl_->activityRoutingKey);
+        }
+        catch (std::exception& e) {
+            std::lock_guard<std::mutex> lock(pimpl_->errorLogMutex);
+            pimpl_->errorLog.SetError(e.what());
+        }
+    });
+
+    std::lock_guard<std::mutex> lock(pimpl_->activityFuturesMutex);
+    pimpl_->activityFutures.push_back(std::move(handle));
 }
 
 std::string PostOffice::GetError()
