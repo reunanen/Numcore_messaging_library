@@ -24,6 +24,16 @@ int DefaultPostOfficeInitializer::GetMessagingServerPort()
 	return 5672;
 }
 
+std::string DefaultPostOfficeInitializer::GetMessagingServerUsername()
+{
+	return "";
+}
+
+std::string DefaultPostOfficeInitializer::GetMessagingServerPassword()
+{
+	return "";
+}
+
 size_t DefaultPostOfficeInitializer::GetReceiveBufferMaxItemCount()
 {
 	return 262144;
@@ -65,6 +75,16 @@ int IniFilePostOfficeInitializer::GetMessagingServerPort()
 {
 	int port = static_cast<int>(iniFile.GetSetValue("MessagingServer", "Port", 5672, "The port that the RabbitMQ server listens to (default is 5672)."));
 	return port;
+}
+
+std::string IniFilePostOfficeInitializer::GetMessagingServerUsername()
+{
+	return iniFile.GetSetValue("MessagingServer", "Username", "guest", "The RabbitMQ username.");
+}
+
+std::string IniFilePostOfficeInitializer::GetMessagingServerPassword()
+{
+	return iniFile.GetSetValue("MessagingServer", "Password", "guest", "The RabbitMQ user's password.");
 }
 
 size_t IniFilePostOfficeInitializer::GetReceiveBufferMaxItemCount()

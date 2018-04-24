@@ -29,13 +29,15 @@
 namespace claim {
 
 std::shared_ptr<slaim::PostOffice> CreatePostOffice(PostOfficeInitializer& initializer, const char* clientIdentifier) {
-	std::string host = initializer.GetMessagingServerHost();
-	int port = initializer.GetMessagingServerPort();
-
-    // TODO: add username and password
+	const std::string host = initializer.GetMessagingServerHost();
+	const int port = initializer.GetMessagingServerPort();
+	const std::string username = initializer.GetMessagingServerUsername();
+	const std::string password = initializer.GetMessagingServerPassword();
 
 	std::ostringstream oss;
-	oss << "";
+	if (!username.empty() && !password.empty()) {
+		oss << username << ":" << password << "@";
+	}
 	if (host.empty()) {
 		oss << "localhost";
 	}
