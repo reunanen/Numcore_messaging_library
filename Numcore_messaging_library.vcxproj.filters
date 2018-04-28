@@ -146,9 +146,6 @@
     <ClInclude Include="messaging\slaim\postoffice.h">
       <Filter>messaging\slaim</Filter>
     </ClInclude>
-    <ClInclude Include="messaging\slaim\postoffice_extended.h">
-      <Filter>messaging\slaim</Filter>
-    </ClInclude>
     <ClInclude Include="messaging\claim\AttributeMessage.h">
       <Filter>messaging\claim</Filter>
     </ClInclude>

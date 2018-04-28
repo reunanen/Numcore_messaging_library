@@ -303,7 +303,6 @@
     <ClInclude Include="messaging\slaim\errorlog.h" />
     <ClInclude Include="messaging\slaim\message.h" />
     <ClInclude Include="messaging\slaim\postoffice.h" />
-    <ClInclude Include="messaging\slaim\postoffice_extended.h" />
     <ClInclude Include="numcfc\IdGenerator.h" />
     <ClInclude Include="numcfc\IniFile.h" />
     <ClInclude Include="numcfc\Logger.h" />
