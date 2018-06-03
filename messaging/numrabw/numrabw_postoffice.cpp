@@ -45,7 +45,7 @@ using namespace slaim;
 class PostOffice::Pimpl {
 public:
     Pimpl(const char* clientIdentifier)
-        : clientIdentifier(clientIdentifier ? clientIdentifier : "unknown")
+        : clientIdentifier(std::string(clientIdentifier ? clientIdentifier : "unknown") + " @ " + numcfc::GenerateId(numcfc::GetHostname(), numcfc::GetIpAddresses(), numcfc::GetWorkingDirectory()))
     {}
 
     ~Pimpl()
