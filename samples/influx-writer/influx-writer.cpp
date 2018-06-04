@@ -31,6 +31,8 @@ int main(int argc, char* argv[])
 
     const std::string retention = iniFile.GetSetValue("InfluxDB", "Retention", "4w", "See https://docs.influxdata.com/influxdb/v0.9/query_language/database_management/#retention-policy-management");
 
+    const bool debugMode = iniFile.GetSetValue("InfluxWriter", "DebugMode", 0) > 0;
+
     numcfc::Logger::LogAndEcho("Writing to: " + url + " : " + db);
 
     if (iniFile.IsDirty()) {
@@ -103,6 +105,9 @@ int main(int argc, char* argv[])
             
             for (const auto& valueToWrite : valuesToWrite) {
                 write += valueToWrite.first + " value=" + valueToWrite.second + "\n";
+                if (debugMode) {
+                    numcfc::Logger::LogAndEcho(valueToWrite.first + " = " + valueToWrite.second, "log_debug");
+                }
             }
 
             curl_easy_setopt(curl, CURLOPT_POSTFIELDS, write.c_str());
