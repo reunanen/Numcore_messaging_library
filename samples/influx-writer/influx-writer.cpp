@@ -17,6 +17,13 @@ int main(int argc, char* argv[])
 {
 	numcfc::Logger::LogAndEcho("influx-writer starting - initializing...");
 
+    auto curl = curl_easy_init();
+
+    if (!curl) {
+        numcfc::Logger::LogAndEcho("curl_easy_init() failed", "log_error");
+        exit(1);
+    }
+
 	numcfc::IniFile iniFile("influx-writer.ini");
 
     claim::PostOffice postOffice;
@@ -38,13 +45,6 @@ int main(int argc, char* argv[])
     if (iniFile.IsDirty()) {
         numcfc::Logger::LogAndEcho("Saving the ini file...");
         iniFile.Save();
-    }
-
-    auto curl = curl_easy_init();
-
-    if (!curl) {
-        numcfc::Logger::LogAndEcho("curl_easy_init() failed", "log_error");
-        exit(1);
     }
 
     // create database
