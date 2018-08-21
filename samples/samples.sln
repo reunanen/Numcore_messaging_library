@@ -15,6 +15,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "influx-writer", "influx-wri
 		{5853D66D-F89D-49C6-A590-71C828686ABE} = {5853D66D-F89D-49C6-A590-71C828686ABE}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "disk-space-logger", "disk-space-logger\disk-space-logger.vcxproj", "{4CFB13B6-8DA0-4B22-8FAE-3BE59AE369C4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5853D66D-F89D-49C6-A590-71C828686ABE} = {5853D66D-F89D-49C6-A590-71C828686ABE}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -45,6 +50,14 @@ Global
 		{A6FD2FC7-E55F-43CA-8BA6-EB7921D2BC32}.Release|Win32.Build.0 = Release|Win32
 		{A6FD2FC7-E55F-43CA-8BA6-EB7921D2BC32}.Release|x64.ActiveCfg = Release|x64
 		{A6FD2FC7-E55F-43CA-8BA6-EB7921D2BC32}.Release|x64.Build.0 = Release|x64
+		{4CFB13B6-8DA0-4B22-8FAE-3BE59AE369C4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4CFB13B6-8DA0-4B22-8FAE-3BE59AE369C4}.Debug|Win32.Build.0 = Debug|Win32
+		{4CFB13B6-8DA0-4B22-8FAE-3BE59AE369C4}.Debug|x64.ActiveCfg = Debug|x64
+		{4CFB13B6-8DA0-4B22-8FAE-3BE59AE369C4}.Debug|x64.Build.0 = Debug|x64
+		{4CFB13B6-8DA0-4B22-8FAE-3BE59AE369C4}.Release|Win32.ActiveCfg = Release|Win32
+		{4CFB13B6-8DA0-4B22-8FAE-3BE59AE369C4}.Release|Win32.Build.0 = Release|Win32
+		{4CFB13B6-8DA0-4B22-8FAE-3BE59AE369C4}.Release|x64.ActiveCfg = Release|x64
+		{4CFB13B6-8DA0-4B22-8FAE-3BE59AE369C4}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
