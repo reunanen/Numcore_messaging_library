@@ -8,6 +8,7 @@
 #include <messaging/claim/AttributeMessage.h>
 #include <numcfc/Logger.h>
 #include <numcfc/Time.h>
+#include <numcfc/IdGenerator.h>
 
 #include <chrono>
 #include <thread>
@@ -41,8 +42,10 @@ int main(int argc, char* argv[])
         claim::AttributeMessage amsg;
         amsg.m_type = "influx-output";
 
+        const std::string hostname = numcfc::GetHostname();
+
 #if _WIN32
-        const DWORD logicalDrives = GetLogicalDrives();       
+        const DWORD logicalDrives = GetLogicalDrives();
 
         for (int drive = 0; drive < 32; ++drive) {
             const auto driveExists = (logicalDrives >> drive) & 1;
@@ -53,7 +56,7 @@ int main(int argc, char* argv[])
                 if (GetDiskFreeSpaceExA(driveRoot.c_str(), &freeBytesAvailableToCaller, &totalNumberOfBytes, &totalNumberOfFreeBytes)) {
                     std::ostringstream oss;
                     oss << std::setprecision(12) << totalNumberOfFreeBytes.QuadPart * 1e-9;
-                    amsg.m_attributes[std::string("freeBytes_GB_") + driveLetter] = oss.str();
+                    amsg.m_attributes["freeBytes_GB,hostname=" + hostname + ",drive=" + driveLetter] = oss.str();
                     numcfc::Logger::LogAndEcho(driveLetter + std::string(": free space = ") + oss.str() + " GB");
                 }
             }
