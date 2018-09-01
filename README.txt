@@ -1,9 +1,9 @@
-The Numcore messaging library v2.0
+The Numcore messaging library v3.0
 ==================================
 
 Copyright 2007-2008 Juha Reunanen
           2008-2012 Numcore Ltd
-          2014,2016 Juha Reunanen
+          2014,2016,2018 Juha Reunanen
 
 This library was used in Numcore Ltd's products to send and
 receive messages between different applications that may run
@@ -13,11 +13,9 @@ The first versions of the library basically extended the
 Spread toolkit (see http://www.spread.org/) in a limited
 number of ways.
 
-The present version (2+) replaces the Spread toolkit (which
-has a somewhat nasty license) with a custom broker. The
-communication is based on ZeroMQ. Correct – ZeroMQ perhaps
-is better used without a broker. However, the present
-implementation is just a convenience wrapper allowing
+The present version (3+) replaces the Spread toolkit (which
+has a somewhat nasty license) with RabbitMQ. The implementation
+is not really much more than a convenience wrapper allowing
 applications to get rid of the Spread toolkit's license,
 without requiring any changes in the code.
 
@@ -29,14 +27,11 @@ Basically the library comprises a number of sublibraries:
    General-purpose classes for representing time, threads, etc.
 2) slaim: Simple Library for Application-Independent Messaging
    A minimalist library defining the messaging API.
-3) num0w: Numcore ZeroMQ Wrapper
-   A slaim-compliant wrapper for use with ZeroMQ.
+3) numrabw: Numcore RabbitMQ Wrapper
+   A slaim-compliant wrapper for use with RabbitMQ.
 4) claim: Complicated Library for Application-Independent
    Messaging
-   Higher-level concepts such as the threaded and buffered
-   post office class and attribute message. Depends on numcfc,
-   and takes a lot of benefit from the Boost library (see
-   http://www.boost.org/).
+   Some higher-level concepts, such as claim::AttributeMessage.
 
 Juha Reunanen and Numcore Ltd have decided to release the
 library under the Boost Software License (see accompanying file
@@ -45,6 +40,9 @@ in order to promote its use in joint projects and elsewhere.
 
 
 Version history:
+
+v3.0 (2018-03-25):
+- Switch from ZeroMQ to RabbitMQ
 
 v2.0 (2016-07-25):
 - Switch from Spread toolkit to ZeroMQ and custom broker

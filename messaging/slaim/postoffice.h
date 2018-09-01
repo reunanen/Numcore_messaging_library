@@ -16,6 +16,12 @@
 #include "errorlog.h"
 #include "message.h"
 
+#ifdef WIN32
+#pragma comment(lib, "Ws2_32.lib")
+#pragma comment(lib, "Ole32.lib")
+#pragma comment(lib, "Advapi32.lib")
+#endif
+
 namespace slaim {
 
 //! A generic post office interface.
@@ -63,15 +69,6 @@ public:
 		\return If the return value is true, then a complete message was received.
 	*/
 	virtual bool Receive(Message& msg, double maxSecondsToWait = 0) = 0;
-
-	//! Set a tag identifying the client. 
-	/*! \param clientIdentifier The maximum length of the identifier depends on the implementation.
-	           However, the client programmer should not really have to worry about this; the 
-			   identifier will surely be truncated, if necessary. To stay on the safe side however, 
-			   it might be good to limit it to, say, 8 characters at most.
-			   THIS METHOD HAS BEEN DEPRECATED!
-	*/
-	virtual void SetClientIdentifier(const std::string& clientIdentifier) = 0;
 
 	//! Get the address identifying the client. 
 	virtual std::string GetClientAddress() const = 0;

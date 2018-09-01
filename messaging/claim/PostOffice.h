@@ -44,7 +44,6 @@ public:
 	virtual bool Send(const slaim::Message& msg);
 	virtual bool Receive(slaim::Message& msg, double maxSecondsToWait = 0);
 
-	virtual void SetClientIdentifier(const std::string& clientIdentifier); // deprecated
 	virtual std::string GetClientAddress() const;
 	virtual const char* GetVersion() const;
 	virtual std::string GetError();
@@ -54,7 +53,6 @@ private:
     PostOffice(const PostOffice&);
     PostOffice& operator= (const PostOffice&);
 
-	void CopyError();
 	void CheckInitialized() const; // throws if not
 
 	class Impl;

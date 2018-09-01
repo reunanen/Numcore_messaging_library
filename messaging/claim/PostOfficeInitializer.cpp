@@ -21,12 +21,17 @@ std::string DefaultPostOfficeInitializer::GetMessagingServerHost()
 
 int DefaultPostOfficeInitializer::GetMessagingServerPort()
 {
-	return 4808;
+	return 5672;
 }
 
-bool DefaultPostOfficeInitializer::IsBuffered()
+std::string DefaultPostOfficeInitializer::GetMessagingServerUsername()
 {
-	return true;
+	return "";
+}
+
+std::string DefaultPostOfficeInitializer::GetMessagingServerPassword()
+{
+	return "";
 }
 
 size_t DefaultPostOfficeInitializer::GetReceiveBufferMaxItemCount()
@@ -62,20 +67,24 @@ std::string IniFilePostOfficeInitializer::GetMessagingServerHost()
 	const char* defaultHost = "";
 #endif // WIN32
 
-	std::string host = iniFile.GetSetValue("MessageBroker", "Host", defaultHost, "IP address or network hostname of the messaging server.");
+	std::string host = iniFile.GetSetValue("MessagingServer", "Host", defaultHost, "IP address or network hostname of the messaging server.");
 	return host;
 }
 
 int IniFilePostOfficeInitializer::GetMessagingServerPort()
 {
-	int port = static_cast<int>(iniFile.GetSetValue("MessageBroker", "Port", 4808, "The port that the messaging server listens to (default is 4808)."));
+	int port = static_cast<int>(iniFile.GetSetValue("MessagingServer", "Port", 5672, "The port that the RabbitMQ server listens to (default is 5672)."));
 	return port;
 }
 
-bool IniFilePostOfficeInitializer::IsBuffered()
+std::string IniFilePostOfficeInitializer::GetMessagingServerUsername()
 {
-	int bufferedPostOffice = static_cast<int>(iniFile.GetSetValue("PostOffice", "Buffered", 1, "Use buffered post office? (0/1)"));
-	return bufferedPostOffice != 0;
+	return iniFile.GetSetValue("MessagingServer", "Username", "guest", "The RabbitMQ username.");
+}
+
+std::string IniFilePostOfficeInitializer::GetMessagingServerPassword()
+{
+	return iniFile.GetSetValue("MessagingServer", "Password", "guest", "The RabbitMQ user's password.");
 }
 
 size_t IniFilePostOfficeInitializer::GetReceiveBufferMaxItemCount()

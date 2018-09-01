@@ -18,8 +18,9 @@ class PostOfficeInitializer
 public:
 	virtual std::string GetMessagingServerHost() = 0;
 	virtual int GetMessagingServerPort() = 0;
+	virtual std::string GetMessagingServerUsername() = 0;
+	virtual std::string GetMessagingServerPassword() = 0;
 
-	virtual bool IsBuffered() = 0;
 	virtual size_t GetReceiveBufferMaxItemCount() = 0;
 	virtual double GetReceiveBufferMaxMegabytes() = 0;
 	virtual size_t GetSendBufferMaxItemCount() = 0;
@@ -29,14 +30,15 @@ public:
 class DefaultPostOfficeInitializer : public PostOfficeInitializer
 {
 public:
-	virtual std::string GetMessagingServerHost();
-	virtual int GetMessagingServerPort();
+	virtual std::string GetMessagingServerHost() override;
+	virtual int GetMessagingServerPort() override;
+	virtual std::string GetMessagingServerUsername() override;
+	virtual std::string GetMessagingServerPassword() override;
 
-	virtual bool IsBuffered();
-	virtual size_t GetReceiveBufferMaxItemCount();
-	virtual double GetReceiveBufferMaxMegabytes();
-	virtual size_t GetSendBufferMaxItemCount();
-	virtual double GetSendBufferMaxMegabytes();
+	virtual size_t GetReceiveBufferMaxItemCount() override;
+	virtual double GetReceiveBufferMaxMegabytes() override;
+	virtual size_t GetSendBufferMaxItemCount() override;
+	virtual double GetSendBufferMaxMegabytes() override;
 };
 
 class IniFilePostOfficeInitializer : public PostOfficeInitializer
@@ -44,14 +46,15 @@ class IniFilePostOfficeInitializer : public PostOfficeInitializer
 public:
 	IniFilePostOfficeInitializer(numcfc::IniFile& iniFile);
 
-	virtual std::string GetMessagingServerHost();
-	virtual int GetMessagingServerPort();
+	virtual std::string GetMessagingServerHost() override;
+	virtual int GetMessagingServerPort() override;
+	virtual std::string GetMessagingServerUsername() override;
+	virtual std::string GetMessagingServerPassword() override;
 
-	virtual bool IsBuffered();
-	virtual size_t GetReceiveBufferMaxItemCount();
-	virtual double GetReceiveBufferMaxMegabytes();
-	virtual size_t GetSendBufferMaxItemCount();
-	virtual double GetSendBufferMaxMegabytes();	
+	virtual size_t GetReceiveBufferMaxItemCount() override;
+	virtual double GetReceiveBufferMaxMegabytes() override;
+	virtual size_t GetSendBufferMaxItemCount() override;
+	virtual double GetSendBufferMaxMegabytes() override;
 
 private:
 	numcfc::IniFile& iniFile;

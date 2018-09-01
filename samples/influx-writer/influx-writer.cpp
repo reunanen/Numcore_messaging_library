@@ -17,6 +17,13 @@ int main(int argc, char* argv[])
 {
 	numcfc::Logger::LogAndEcho("influx-writer starting - initializing...");
 
+    auto curl = curl_easy_init();
+
+    if (!curl) {
+        numcfc::Logger::LogAndEcho("curl_easy_init() failed", "log_error");
+        exit(1);
+    }
+
 	numcfc::IniFile iniFile("influx-writer.ini");
 
     claim::PostOffice postOffice;
@@ -31,18 +38,13 @@ int main(int argc, char* argv[])
 
     const std::string retention = iniFile.GetSetValue("InfluxDB", "Retention", "4w", "See https://docs.influxdata.com/influxdb/v0.9/query_language/database_management/#retention-policy-management");
 
+    const bool debugMode = iniFile.GetSetValue("InfluxWriter", "DebugMode", 0) > 0;
+
     numcfc::Logger::LogAndEcho("Writing to: " + url + " : " + db);
 
     if (iniFile.IsDirty()) {
         numcfc::Logger::LogAndEcho("Saving the ini file...");
         iniFile.Save();
-    }
-
-    auto curl = curl_easy_init();
-
-    if (!curl) {
-        numcfc::Logger::LogAndEcho("curl_easy_init() failed", "log_error");
-        exit(1);
     }
 
     // create database
@@ -103,6 +105,9 @@ int main(int argc, char* argv[])
             
             for (const auto& valueToWrite : valuesToWrite) {
                 write += valueToWrite.first + " value=" + valueToWrite.second + "\n";
+                if (debugMode) {
+                    numcfc::Logger::LogAndEcho(valueToWrite.first + " = " + valueToWrite.second, "log_debug");
+                }
             }
 
             curl_easy_setopt(curl, CURLOPT_POSTFIELDS, write.c_str());

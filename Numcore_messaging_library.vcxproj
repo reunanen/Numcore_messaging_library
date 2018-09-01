@@ -71,27 +71,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>.;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>$(SolutionDir)$(Platform)/$(Configuration)DynamicRuntime;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
+    <IncludePath>.;$(ProjectDir)/messaging/numrabw/amqpcpp/include;$(ProjectDir)/messaging/numrabw/rabbitmq-c/librabbitmq;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>.;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>$(SolutionDir)$(Platform)/$(Configuration)DynamicRuntime;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <IncludePath>.;$(ProjectDir)/messaging/numrabw/amqpcpp/include;$(ProjectDir)/messaging/numrabw/rabbitmq-c/librabbitmq;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>.;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>$(SolutionDir)$(Platform)/$(Configuration)DynamicRuntime;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
+    <IncludePath>.;$(ProjectDir)/messaging/numrabw/amqpcpp/include;$(ProjectDir)/messaging/numrabw/rabbitmq-c/librabbitmq;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>.;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>$(SolutionDir)$(Platform)/$(Configuration)DynamicRuntime;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <IncludePath>.;$(ProjectDir)/messaging/numrabw/amqpcpp/include;$(ProjectDir)/messaging/numrabw/rabbitmq-c/librabbitmq;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -105,7 +105,8 @@
       <AdditionalDependencies />
     </Link>
     <Lib>
-      <AdditionalDependencies>libzmq.lib;advapi32.lib;ws2_32.lib;Iphlpapi.lib</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -121,7 +122,8 @@
       </AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalDependencies>libzmq.lib;advapi32.lib;ws2_32.lib;Iphlpapi.lib</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -135,7 +137,8 @@
       <AdditionalDependencies />
     </Link>
     <Lib>
-      <AdditionalDependencies>libzmq.lib;advapi32.lib;ws2_32.lib;Iphlpapi.lib</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -150,7 +153,8 @@
       </AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalDependencies>libzmq.lib;advapi32.lib;ws2_32.lib;Iphlpapi.lib</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -163,18 +167,123 @@
     <ClCompile Include="messaging\claim\MessageStreaming.cpp" />
     <ClCompile Include="messaging\claim\PostOffice.cpp" />
     <ClCompile Include="messaging\claim\PostOfficeInitializer.cpp" />
-    <ClCompile Include="messaging\num0w\num0w_postoffice.cpp">
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WIN32;ZMQ_STATIC;ZMQ_HAVE_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">WIN32;ZMQ_STATIC;ZMQ_HAVE_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WIN32;ZMQ_STATIC;ZMQ_HAVE_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;ZMQ_STATIC;ZMQ_HAVE_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">messaging/num0w/libzmq/include</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">messaging/num0w/libzmq/include</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">messaging/num0w/libzmq/include</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">messaging/num0w/libzmq/include</AdditionalIncludeDirectories>
+    <ClCompile Include="messaging\numrabw\amqpcpp\src\AMQP.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="messaging\numrabw\amqpcpp\src\AMQPBase.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\amqpcpp\src\AMQPException.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\amqpcpp\src\AMQPExchange.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\amqpcpp\src\AMQPMessage.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\amqpcpp\src\AMQPQueue.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_CRT_SECURE_NO_WARNINGS;AMQP_STATIC;AMQP_NO_SSL</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\crossguid\Guid.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WIN32;GUID_WINDOWS;snprintf=_snprintf_s;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">WIN32;GUID_WINDOWS;snprintf=_snprintf_s;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WIN32;GUID_WINDOWS;snprintf=_snprintf_s;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;GUID_WINDOWS;snprintf=_snprintf_s;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\numrabw_postoffice.cpp" />
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_api.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_connection.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_consumer.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_framing.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_hostcheck.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_mem.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_socket.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_table.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_tcp_socket.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_time.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\amqp_url.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AMQP_STATIC;AMQ_PLATFORM="Windows";HAVE_SELECT;inline=__inline</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="messaging\numrabw\rabbitmq-c\librabbitmq\win32\threads.c" />
     <ClCompile Include="messaging\slaim\messaging.cpp" />
-    <ClCompile Include="numcfc\IdGenerator.cpp" />
+    <ClCompile Include="numcfc\IdGenerator.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WIN32;_WINSOCK_DEPRECATED_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">WIN32;_WINSOCK_DEPRECATED_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WIN32;_WINSOCK_DEPRECATED_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;_WINSOCK_DEPRECATED_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="numcfc\IniFile.cpp" />
     <ClCompile Include="numcfc\Logger.cpp" />
     <ClCompile Include="numcfc\ThreadRunner.cpp" />
@@ -186,13 +295,14 @@
     <ClInclude Include="messaging\claim\PostOffice.h" />
     <ClInclude Include="messaging\claim\PostOfficeInitializer.h" />
     <ClInclude Include="messaging\claim\ThroughputStatistics.h" />
-    <ClInclude Include="messaging\num0w\num0w_postoffice.h" />
+    <ClInclude Include="messaging\numrabw\amqpcpp\include\amqpcpp.h" />
+    <ClInclude Include="messaging\numrabw\LimitedSizeBuffer.h" />
+    <ClInclude Include="messaging\numrabw\numrabw_postoffice.h" />
     <ClInclude Include="messaging\slaim\buffer.h" />
     <ClInclude Include="messaging\slaim\bufferitem.h" />
     <ClInclude Include="messaging\slaim\errorlog.h" />
     <ClInclude Include="messaging\slaim\message.h" />
     <ClInclude Include="messaging\slaim\postoffice.h" />
-    <ClInclude Include="messaging\slaim\postoffice_extended.h" />
     <ClInclude Include="numcfc\IdGenerator.h" />
     <ClInclude Include="numcfc\IniFile.h" />
     <ClInclude Include="numcfc\Logger.h" />
