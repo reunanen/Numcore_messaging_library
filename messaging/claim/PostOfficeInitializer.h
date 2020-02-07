@@ -20,6 +20,7 @@ public:
 	virtual int GetMessagingServerPort() = 0;
 	virtual std::string GetMessagingServerUsername() = 0;
 	virtual std::string GetMessagingServerPassword() = 0;
+    virtual std::string GetMessagingServerVirtualHost() = 0;
 
 	virtual size_t GetReceiveBufferMaxItemCount() = 0;
 	virtual double GetReceiveBufferMaxMegabytes() = 0;
@@ -34,6 +35,7 @@ public:
 	virtual int GetMessagingServerPort() override;
 	virtual std::string GetMessagingServerUsername() override;
 	virtual std::string GetMessagingServerPassword() override;
+    virtual std::string GetMessagingServerVirtualHost() override;
 
 	virtual size_t GetReceiveBufferMaxItemCount() override;
 	virtual double GetReceiveBufferMaxMegabytes() override;
@@ -50,6 +52,7 @@ public:
 	virtual int GetMessagingServerPort() override;
 	virtual std::string GetMessagingServerUsername() override;
 	virtual std::string GetMessagingServerPassword() override;
+    virtual std::string GetMessagingServerVirtualHost() override;
 
 	virtual size_t GetReceiveBufferMaxItemCount() override;
 	virtual double GetReceiveBufferMaxMegabytes() override;

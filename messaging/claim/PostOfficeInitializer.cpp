@@ -34,6 +34,11 @@ std::string DefaultPostOfficeInitializer::GetMessagingServerPassword()
 	return "";
 }
 
+std::string DefaultPostOfficeInitializer::GetMessagingServerVirtualHost()
+{
+    return "";
+}
+
 size_t DefaultPostOfficeInitializer::GetReceiveBufferMaxItemCount()
 {
 	return 262144;
@@ -85,6 +90,11 @@ std::string IniFilePostOfficeInitializer::GetMessagingServerUsername()
 std::string IniFilePostOfficeInitializer::GetMessagingServerPassword()
 {
 	return iniFile.GetSetValue("MessagingServer", "Password", "guest", "The RabbitMQ user's password.");
+}
+
+std::string IniFilePostOfficeInitializer::GetMessagingServerVirtualHost()
+{
+    return iniFile.GetSetValue("MessagingServer", "VirtualHost", "", "The RabbitMQ virtual host.");
 }
 
 size_t IniFilePostOfficeInitializer::GetReceiveBufferMaxItemCount()

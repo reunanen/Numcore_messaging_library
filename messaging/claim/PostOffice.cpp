@@ -33,6 +33,7 @@ std::shared_ptr<slaim::PostOffice> CreatePostOffice(PostOfficeInitializer& initi
 	const int port = initializer.GetMessagingServerPort();
 	const std::string username = initializer.GetMessagingServerUsername();
 	const std::string password = initializer.GetMessagingServerPassword();
+    const std::string vhost = initializer.GetMessagingServerVirtualHost();
 
 	std::ostringstream oss;
 	if (!username.empty() && !password.empty()) {
@@ -45,6 +46,11 @@ std::shared_ptr<slaim::PostOffice> CreatePostOffice(PostOfficeInitializer& initi
 		oss << host;
 	}
 	oss << ":" << port;
+
+    if (!vhost.empty()) {
+        oss << "/" << vhost;
+    }
+
 	std::string connectInfo = oss.str();
 
 	auto postOffice = std::make_shared<numrabw::PostOffice>(connectInfo, clientIdentifier);
