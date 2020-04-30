@@ -191,7 +191,10 @@ int PostOffice::Pimpl::HandleReceivedMessage(AMQPMessage* m)
         }
     }
 
-    if (!recvBuffer.push_back(msg)) {
+    if (recvBuffer.push_back(msg)) {
+        recvThroughput.AddThroughput(msg.GetSize());
+    }
+    else {
         {
             // TODO: based on priorities, consider removing some message that is already in the buffer
             std::pair<size_t, size_t> bufferSize = recvBuffer.GetItemAndByteCount();
@@ -202,14 +205,17 @@ int PostOffice::Pimpl::HandleReceivedMessage(AMQPMessage* m)
             errorLog.SetError(oss.str());
         }
 
-        while (!killed && !recvBuffer.push_back(msg)) {
-            std::this_thread::sleep_for(std::chrono::seconds(1)); // TODO: add a blocking push_back to the buffer itself
-        }
-
-        if (!killed) {
-            recvThroughput.AddThroughput(msg.GetSize());
+        while (!killed) {
+            if (recvBuffer.push_back(msg)) {
+                recvThroughput.AddThroughput(msg.GetSize());
+                break;
+            }
+            else {
+                std::this_thread::sleep_for(std::chrono::seconds(1)); // TODO: add a blocking push_back to the buffer itself
+            }
         }
     }
+
     return 0;
 };
 
