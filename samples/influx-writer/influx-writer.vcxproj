@@ -311,10 +311,10 @@
     <ClCompile Include="curl\lib\wildcard.c" />
     <ClCompile Include="curl\lib\x509asn1.c" />
     <ClCompile Include="influx-writer.cpp">
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WIN32;BUILDING_LIBCURL;CURL_STATICLIB;_SH_DENYNO=0x40;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">WIN32;BUILDING_LIBCURL;CURL_STATICLIB;_SH_DENYNO=0x40;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WIN32;BUILDING_LIBCURL;CURL_STATICLIB;_SH_DENYNO=0x40;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;BUILDING_LIBCURL;CURL_STATICLIB;_SH_DENYNO=0x40;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WIN32;BUILDING_LIBCURL;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_SH_DENYNO=0x40;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">WIN32;BUILDING_LIBCURL;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_SH_DENYNO=0x40;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WIN32;BUILDING_LIBCURL;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_SH_DENYNO=0x40;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;BUILDING_LIBCURL;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_SH_DENYNO=0x40;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

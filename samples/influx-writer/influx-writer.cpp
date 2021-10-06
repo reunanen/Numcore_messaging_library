@@ -38,6 +38,8 @@ int main(int argc, char* argv[])
 
     const std::string retention = iniFile.GetSetValue("InfluxDB", "Retention", "4w", "See https://docs.influxdata.com/influxdb/v0.9/query_language/database_management/#retention-policy-management");
 
+    const bool adminMode = iniFile.GetSetValue("InfluxWriter", "AdminMode", 1) > 0;
+
     const bool debugMode = iniFile.GetSetValue("InfluxWriter", "DebugMode", 0) > 0;
 
     numcfc::Logger::LogAndEcho("Writing to: " + url + " : " + db);
@@ -47,41 +49,55 @@ int main(int argc, char* argv[])
         iniFile.Save();
     }
 
-    // create database
-    curl_easy_setopt(curl, CURLOPT_URL, (url + "query").c_str());
-    
-    const std::string createDatabase = "q=CREATE DATABASE " + db;
+    const auto username = getenv("INFLUXDB_USERNAME");
+    const auto password = getenv("INFLUXDB_PASSWORD");
 
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, createDatabase.c_str());
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, createDatabase.length());
+    std::string authentication1, authentication2;
 
-    auto result = curl_easy_perform(curl);
-    if (result != CURLE_OK) {
-        numcfc::Logger::LogAndEcho("Creating a database failed: " + std::string(curl_easy_strerror(result)), "log_error");
+    if (username && password) {
+        numcfc::Logger::LogAndEcho("Username: " + std::string(username));
+        const std::string authentication = "u=" + std::string(username) + "&p=" + std::string(password);
+        authentication1 = "?" + authentication;
+        authentication2 = "&" + authentication;
     }
 
-    // create a new retention policy
-    const std::string createRetentionPolicy = "q=CREATE RETENTION POLICY default_retention_policy ON " + db + " DURATION " + retention + " REPLICATION 1 DEFAULT";
+    if (adminMode) {
+        // create database
+        curl_easy_setopt(curl, CURLOPT_URL, (url + "query" + authentication1).c_str());
 
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, createRetentionPolicy.c_str());
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, createRetentionPolicy.length());
+        const std::string createDatabase = "q=CREATE DATABASE " + db;
 
-    result = curl_easy_perform(curl);
-    if (result != CURLE_OK) {
-        // probably the retention policy already exists - try to modify it
-        const std::string alterRetentionPolicy = "q=ALTER RETENTION POLICY default_retention_policy ON " + db + " DURATION " + retention + " REPLICATION 1 DEFAULT";
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, createDatabase.c_str());
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, createDatabase.length());
 
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, alterRetentionPolicy.c_str());
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, alterRetentionPolicy.length());
+        auto result = curl_easy_perform(curl);
+        if (result != CURLE_OK) {
+            numcfc::Logger::LogAndEcho("Creating a database failed: " + std::string(curl_easy_strerror(result)), "log_error");
+        }
+
+        // create a new retention policy
+        const std::string createRetentionPolicy = "q=CREATE RETENTION POLICY default_retention_policy ON " + db + " DURATION " + retention + " REPLICATION 1 DEFAULT";
+
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, createRetentionPolicy.c_str());
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, createRetentionPolicy.length());
 
         result = curl_easy_perform(curl);
         if (result != CURLE_OK) {
-            numcfc::Logger::LogAndEcho("Creating and modifying a new retention policy failed: " + std::string(curl_easy_strerror(result)), "log_error");
+            // probably the retention policy already exists - try to modify it
+            const std::string alterRetentionPolicy = "q=ALTER RETENTION POLICY default_retention_policy ON " + db + " DURATION " + retention + " REPLICATION 1 DEFAULT";
+
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, alterRetentionPolicy.c_str());
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, alterRetentionPolicy.length());
+
+            result = curl_easy_perform(curl);
+            if (result != CURLE_OK) {
+                numcfc::Logger::LogAndEcho("Creating and modifying a new retention policy failed: " + std::string(curl_easy_strerror(result)), "log_error");
+            }
         }
     }
 
     // write data
-    curl_easy_setopt(curl, CURLOPT_URL, (url + "write?db=" + db).c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, (url + "write?db=" + db + authentication2).c_str());
 
     while (true) {
         std::unordered_map<std::string, std::string> valuesToWrite;
