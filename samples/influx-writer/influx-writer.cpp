@@ -38,6 +38,8 @@ int main(int argc, char* argv[])
 
     const std::string retention = iniFile.GetSetValue("InfluxDB", "Retention", "4w", "See https://docs.influxdata.com/influxdb/v0.9/query_language/database_management/#retention-policy-management");
 
+    const std::string username = iniFile.GetSetValue("InfluxDB", "Username", "", "User to log in to InfluxDB as (set password via environment variable INFLUXDB_PASSWORD)");
+
     const bool adminMode = iniFile.GetSetValue("InfluxWriter", "AdminMode", 1) > 0;
 
     const bool debugMode = iniFile.GetSetValue("InfluxWriter", "DebugMode", 0) > 0;
@@ -49,14 +51,19 @@ int main(int argc, char* argv[])
         iniFile.Save();
     }
 
-    const auto username = getenv("INFLUXDB_USERNAME");
-    const auto password = getenv("INFLUXDB_PASSWORD");
-
     std::string authentication1, authentication2;
 
-    if (username && password) {
+    if (!username.empty()) {
         numcfc::Logger::LogAndEcho("Username: " + std::string(username));
-        const std::string authentication = "u=" + std::string(username) + "&p=" + std::string(password);
+
+        const auto password = getenv("INFLUXDB_PASSWORD");
+
+        if (!password) {
+            numcfc::Logger::LogAndEcho("When username is non-empty, you need to set password via environment variable INFLUXDB_PASSWORD", "log_error");
+            exit(2);
+        }
+
+        const std::string authentication = "u=" + username + "&p=" + std::string(password);
         authentication1 = "?" + authentication;
         authentication2 = "&" + authentication;
     }
