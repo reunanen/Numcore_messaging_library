@@ -237,7 +237,13 @@ void PostOffice::Pimpl::RunSenderThread(const std::string& connectString)
                 errorLog.SetError("Sender now ok");
             }
 
-            auto nextStatusMessageTime = std::chrono::steady_clock::now();
+            auto nextStatusMessageTime = [] {
+                const auto nowSteady = std::chrono::steady_clock::now();
+                const auto nowSystem = std::chrono::system_clock::now();
+                const auto systemSinceEpoch = nowSystem.time_since_epoch();
+                const auto fractionalPart = systemSinceEpoch - std::chrono::floor<std::chrono::seconds>(systemSinceEpoch);
+                return std::chrono::steady_clock::time_point(nowSteady.time_since_epoch() - fractionalPart);
+            }();
             double maxSecondsToWait = 0.0;
 
             while (!killed) {
