@@ -12,6 +12,7 @@
 #include <time.h>
 #include <cstring>
 #include <limits>
+#include <stdexcept>
 
 #ifdef WIN32
 #include <windows.h>
