@@ -14,5 +14,5 @@ add_executable(influx-writer     influx-writer/influx-writer.cpp)
 target_link_libraries(disk-space-logger NumcoreMessagingLibrary)
 target_link_libraries(influx-writer     NumcoreMessagingLibrary curl)
 
-target_compile_options(disk-space-logger PRIVATE -Wextra -Werror)
-target_compile_options(influx-writer     PRIVATE -Wextra -Werror)
+target_compile_options(disk-space-logger PRIVATE -Wall -Wextra -Wpedantic -Werror)
+target_compile_options(influx-writer     PRIVATE -Wall -Wextra -Wpedantic -Werror)

@@ -34,4 +34,4 @@ add_library(NumcoreMessagingLibrary STATIC ${Sources})
 
 target_link_libraries(NumcoreMessagingLibrary rabbitmq-static xg)
 
-target_compile_options(NumcoreMessagingLibrary PUBLIC -Wextra -Werror)
+target_compile_options(NumcoreMessagingLibrary PUBLIC -Wall -Wextra -Wpedantic -Werror)

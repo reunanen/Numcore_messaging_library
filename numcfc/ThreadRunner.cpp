@@ -108,8 +108,6 @@ void ThreadRunner::StartThread()
 
 void ThreadRunner::RunThread(ThreadRunner& threadRunner)
 {
-	const auto threadStartTime = std::chrono::high_resolution_clock::now();
-		
 	try {
 		threadRunner.operator ()();
 	}
@@ -189,7 +187,6 @@ bool MultiThreadRunner::StartThread(const std::string& threadTask)
 
 void MultiThreadRunner::RunThread(MultiThreadRunner& threadRunner, const std::string& threadTask)
 {
-	const auto threadStartTime = std::chrono::high_resolution_clock::now();
 	try {
 		threadRunner.operator ()(threadTask);
 	}

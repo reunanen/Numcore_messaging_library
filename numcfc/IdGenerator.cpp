@@ -73,7 +73,11 @@ std::string GetHostname()
 	}
 }
 
-std::vector<std::string> GetIpAddresses(const std::string& hostname)
+std::vector<std::string> GetIpAddresses(const std::string&
+#ifdef WIN32
+    hostname
+#endif // WIN32
+)
 {
     std::vector<std::string> addresses;
 #ifdef WIN32
