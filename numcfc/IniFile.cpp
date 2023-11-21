@@ -92,7 +92,7 @@ bool IniFile::Refresh()
 	struct stat s;
 	bool bStatOk = (stat(m_defaultFilename.c_str(), &s) == 0);
 #endif
-	if (s.st_mtime != m_tFileModified) {
+	if (bStatOk && s.st_mtime != m_tFileModified) {
 		if (Load(m_defaultFilename.c_str())) {
 			m_tFileModified = s.st_mtime;
 			retVal = true;
