@@ -217,8 +217,7 @@ int PostOffice::Pimpl::HandleReceivedMessage(AMQPMessage* m)
     }
 
     return 0;
-};
-
+}
 
 void PostOffice::Pimpl::RunSenderThread(const std::string& connectString)
 {
