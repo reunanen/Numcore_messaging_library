@@ -19,7 +19,7 @@
 #include <Windows.h>
 #endif // _WIN32
 
-int main(int argc, char* argv[])
+int main()
 {
 	numcfc::Logger::LogAndEcho("disk-space-logger starting - initializing...");
 

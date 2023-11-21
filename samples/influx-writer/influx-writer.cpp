@@ -13,7 +13,7 @@
 
 #include <unordered_map>
 
-int main(int argc, char* argv[])
+int main()
 {
 	numcfc::Logger::LogAndEcho("influx-writer starting - initializing...");
 

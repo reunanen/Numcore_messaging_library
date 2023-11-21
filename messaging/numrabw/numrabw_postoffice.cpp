@@ -292,7 +292,7 @@ slaim::Message PostOffice::Pimpl::GetStatusMessage() { // can be called from the
 #else // WIN32
         char temp[L_cuserid + 1] = { 0 };
         cuserid(temp);
-        m_username = temp;
+        username = temp;
 #endif // WIN32
     }
 

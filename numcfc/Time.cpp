@@ -254,10 +254,6 @@ bool Time::FromExtendedISO(const char* szTime)
 	return true;
 }
 
-#ifndef WIN32
-#include "mktime.c" // we really need mkgmtime
-#endif // WIN32
-
 double Time::GetTime() const
 {
 	struct tm t;
@@ -275,7 +271,11 @@ double Time::GetTime() const
 
 	if (m_type == Universal) {
 		t.tm_isdst = 0;
+#ifdef WIN32
 		tt = _mkgmtime(&t);
+#else
+		tt = timegm(&t);
+#endif
 		if (tt <= 1) {
 			throw std::runtime_error("Invalid UTC date/time: " + ToExtendedISO());
 		}
@@ -295,7 +295,11 @@ double Time::GetTime() const
 #endif // _DEBUG
 #endif // WIN32
 		t.tm_isdst = 0;
+#ifdef WIN32
 		tt = _mkgmtime(&t);
+#else
+		tt = timegm(&t);
+#endif
 		if (tt <= 1) {
 			throw std::runtime_error("Invalid date/time: " + ToExtendedISO());
 		}
