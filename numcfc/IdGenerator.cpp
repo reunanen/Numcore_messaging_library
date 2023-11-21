@@ -1,6 +1,7 @@
 
 //           Copyright 2007-2008 Juha Reunanen
 //                     2008-2011 Numcore Ltd
+//                     2012-2023 Tomaattinen Ltd
 //
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
@@ -19,7 +20,9 @@
 #ifdef _WIN32
 #include <winsock2.h>
 #else // _WIN32
-#include <errno.h>
+#include <netinet/in.h>
+#include <ifaddrs.h>
+#include <arpa/inet.h>
 #endif // _WIN32
 
 // for GetWorkingDirectory()
@@ -37,8 +40,10 @@ IdGenerator::IdGenerator()
 {
 	srand((unsigned int) (time(NULL) + clock()));
 
+#ifdef WIN32
     WSAData wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
+#endif // WIN32
 }
 
 std::string IdGenerator::GenerateId() const
@@ -82,8 +87,34 @@ std::vector<std::string> GetIpAddresses(const std::string& hostname)
         }
     }
 #else
-    // TODO
-    addresses.push_back("Problem: GetIpAddresses not supported on non-Windows platforms yet");
+    // adapted from: https://stackoverflow.com/a/265978
+    struct ifaddrs* ifAddrs = nullptr;
+    getifaddrs(&ifAddrs);
+    for (const auto* ifa = ifAddrs; ifa != nullptr; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr) {
+            if (ifa->ifa_addr->sa_family == AF_INET) {
+                const auto* temp = &((struct sockaddr_in*) ifa->ifa_addr)->sin_addr;
+                char addressBuffer[INET_ADDRSTRLEN + 1];
+                inet_ntop(AF_INET, temp, addressBuffer, INET_ADDRSTRLEN);
+                std::string address(addressBuffer);
+                if (address != "127.0.0.1") {
+                    addresses.push_back(address);
+                }
+            }
+            else if (ifa->ifa_addr->sa_family == AF_INET6) {
+                const auto* temp = &((struct sockaddr_in6*) ifa->ifa_addr)->sin6_addr;
+                char addressBuffer[INET6_ADDRSTRLEN + 1];
+                inet_ntop(AF_INET6, temp, addressBuffer, INET6_ADDRSTRLEN);
+                std::string address(addressBuffer);
+                if (address != "::1") {
+                    addresses.push_back(addressBuffer);
+                }
+            }
+        }
+    }
+    if (ifAddrs) {
+        freeifaddrs(ifAddrs);
+    }
 #endif
     return addresses;
 }
