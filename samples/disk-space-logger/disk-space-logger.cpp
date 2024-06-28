@@ -17,6 +17,9 @@
 
 #ifdef _WIN32
 #include <Windows.h>
+#else // WIN32
+#define _FILE_OFFSET_BITS 64
+#include <sys/statfs.h>
 #endif // _WIN32
 
 int main()
@@ -61,6 +64,12 @@ int main()
                 }
             }
         }
+#else // WIN32
+        struct statfs s = {};
+        statfs("/", &s);
+        std::ostringstream oss;
+        oss << std::setprecision(12) << s.f_bavail * s.f_bsize * 1e-9;
+        amsg.m_attributes["freeBytes_GB,hostname=" + hostname] = oss.str();
 #endif // _WIN32
 
         postOffice.Send(amsg);
