@@ -424,6 +424,25 @@ bool PostOffice::Receive(Message& msg, double maxSecondsToWait)
     return pimpl_->recvBuffer.pop_front(msg, maxSecondsToWait);
 }
 
+slaim::BufferSize GetBufferSize(const LimitedSizeBuffer<slaim::Message>& buffer)
+{
+    const auto itemAndByteCount = buffer.GetItemAndByteCount();
+    return slaim::BufferSize(
+        itemAndByteCount.first,
+        itemAndByteCount.second
+    );
+}
+
+slaim::BufferSize PostOffice::GetSendBufferSize() const
+{
+    return GetBufferSize(pimpl_->sendBuffer);
+}
+
+slaim::BufferSize PostOffice::GetReceiveBufferSize() const
+{
+    return GetBufferSize(pimpl_->recvBuffer);
+}
+
 bool PostOffice::Send(const Message& msg)
 {
     bool retVal = pimpl_->sendBuffer.push_back(msg);

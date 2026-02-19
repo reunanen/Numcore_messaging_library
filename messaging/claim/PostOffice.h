@@ -44,6 +44,9 @@ public:
 	virtual bool Send(const slaim::Message& msg);
 	virtual bool Receive(slaim::Message& msg, double maxSecondsToWait = 0);
 
+	virtual slaim::BufferSize GetSendBufferSize() const override;
+	virtual slaim::BufferSize GetReceiveBufferSize() const override;
+
 	virtual std::string GetClientAddress() const;
 	virtual const char* GetVersion() const;
 	virtual std::string GetError();
