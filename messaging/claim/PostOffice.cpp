@@ -119,6 +119,18 @@ bool PostOffice::Receive(slaim::Message& msg, double maxSecondsToWait)
 	return pimpl_->postOffice->Receive(msg, maxSecondsToWait); 
 }
 
+slaim::BufferSize PostOffice::GetSendBufferSize() const
+{
+	CheckInitialized();
+	return pimpl_->postOffice->GetSendBufferSize();
+}
+
+slaim::BufferSize PostOffice::GetReceiveBufferSize() const
+{
+	CheckInitialized();
+	return pimpl_->postOffice->GetReceiveBufferSize();
+}
+
 std::string PostOffice::GetClientAddress() const
 {
 	CheckInitialized();

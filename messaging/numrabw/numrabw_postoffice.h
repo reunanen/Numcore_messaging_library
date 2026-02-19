@@ -33,6 +33,9 @@ public:
 	// If the return value is true, then a complete message was received.
 	virtual bool Receive(slaim::Message& msg, double maxSecondsToWait = 0) override;
 
+    virtual slaim::BufferSize GetSendBufferSize() const override;
+    virtual slaim::BufferSize GetReceiveBufferSize() const override;
+
     bool IsOk() const; // probably not really needed
 
     virtual const char* GetVersion() const override;

@@ -24,6 +24,16 @@
 
 namespace slaim {
 
+class BufferSize {
+public:
+	BufferSize(size_t itemCount, size_t byteCount) : itemCount(itemCount), byteCount(byteCount) {}
+	size_t GetItemCount() const { return itemCount; }
+	size_t GetByteCount() const { return byteCount; }
+private:
+	const size_t itemCount;
+	const size_t byteCount;
+};
+
 //! A generic post office interface.
 /*! A key concept in any slaim system, post offices are used by applications to tell what kind of data 
 	they would like to receive, and also to actually receive the data, plus to send messages to other
@@ -69,6 +79,12 @@ public:
 		\return If the return value is true, then a complete message was received.
 	*/
 	virtual bool Receive(Message& msg, double maxSecondsToWait = 0) = 0;
+
+	//! Get the current number and total size of messages in the send buffer.
+	virtual BufferSize GetSendBufferSize() const = 0;
+
+	//! Get the current number and total size of messages in the receive buffer.
+	virtual BufferSize GetReceiveBufferSize() const = 0;
 
 	//! Get the address identifying the client. 
 	virtual std::string GetClientAddress() const = 0;
