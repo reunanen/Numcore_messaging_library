@@ -121,11 +121,13 @@ bool PostOffice::Receive(slaim::Message& msg, double maxSecondsToWait)
 
 slaim::BufferSize PostOffice::GetSendBufferSize() const
 {
+	CheckInitialized();
 	return pimpl_->postOffice->GetSendBufferSize();
 }
 
 slaim::BufferSize PostOffice::GetReceiveBufferSize() const
 {
+	CheckInitialized();
 	return pimpl_->postOffice->GetReceiveBufferSize();
 }
 
