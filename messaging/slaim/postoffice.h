@@ -80,7 +80,10 @@ public:
 	*/
 	virtual bool Receive(Message& msg, double maxSecondsToWait = 0) = 0;
 
+	//! Get the current number and total size of messages in the send buffer.
 	virtual BufferSize GetSendBufferSize() const = 0;
+
+	//! Get the current number and total size of messages in the receive buffer.
 	virtual BufferSize GetReceiveBufferSize() const = 0;
 
 	//! Get the address identifying the client. 
