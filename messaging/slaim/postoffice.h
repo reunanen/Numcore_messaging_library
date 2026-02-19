@@ -30,8 +30,8 @@ public:
 	size_t GetItemCount() const { return itemCount; }
 	size_t GetByteCount() const { return byteCount; }
 private:
-	const size_t itemCount = 0;
-	const size_t byteCount = 0;
+	const size_t itemCount;
+	const size_t byteCount;
 };
 
 //! A generic post office interface.
